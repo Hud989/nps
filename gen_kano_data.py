@@ -184,11 +184,44 @@ if col_loja:
         
         l_list = []
         for _, row in s_data.iterrows():
+            rid = row['ResponseID']
             score = row['Nota']
             cat = 'prom' if score >= 9 else ('pass' if score >= 7 else 'detr')
             # Clean name
             name = str(row[col_loja]).upper().strip(' "')[:30]
-            l_list.append({'n': name, 's': float(score), 'c': cat})
+            
+            # Get Details (Scores) from Pivot
+            # pivot has index ResponseID
+            details = {}
+            if rid in pivot.index:
+                # Get series, drop NaNs, convert to dict
+                p_row = pivot.loc[rid]
+                # Filter out metadata columns if any remain (ShoppingCode is one)
+                d_dict = p_row.drop(['ShoppingCode', TARGET], errors='ignore').dropna().to_dict()
+                # Round values
+                details = {k: round(v, 1) for k, v in d_dict.items()}
+            
+            # Get Comments
+            # Filter df_2025 for this RID and non-null comments
+            # Comments might be in any row for this RID
+            comments = df_2025[
+                (df_2025['ResponseID'] == rid) & 
+                (df_2025['Comentario'].notna()) & 
+                (df_2025['Comentario'] != '')
+            ]['Comentario'].unique()
+            
+            comment_text = " | ".join([str(c).strip() for c in comments if str(c).strip()])
+            
+            obj = {
+                'n': name, 
+                's': float(score), 
+                'c': cat,
+                'd': details
+            }
+            if comment_text:
+                obj['t'] = comment_text
+                
+            l_list.append(obj)
             
         lojistas_list[s] = l_list
 else:

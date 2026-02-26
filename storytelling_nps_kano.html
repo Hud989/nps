@@ -104,17 +104,50 @@ section{padding:72px 0;}
 .loj-chip.detr .nota-badge{background:rgba(192,57,43,.2);}
 
 /* tooltip */
-.loj-chip:hover::after{
-  content:attr(data-tip);
-  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
-  background:rgba(13,27,42,.95);color:white;padding:7px 12px;border-radius:8px;
-  font-size:11px;white-space:nowrap;z-index:300;pointer-events:none;
-  box-shadow:0 4px 14px rgba(0,0,0,.3);
+/* REMOVED CSS TOOLTIP IN FAVOR OF JS POPOVER */
+.loj-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.15); z-index: 10; }
+
+/* HOVER PANEL */
+.popover {
+  position: fixed;
+  z-index: 1000;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25), 0 2px 10px rgba(0,0,0,0.1);
+  width: 300px;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  transform: translateY(10px);
+  font-size: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
 }
-.loj-chip:hover::before{
-  content:'';position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);
-  border:5px solid transparent;border-top-color:rgba(13,27,42,.95);z-index:301;pointer-events:none;
+.popover.visible { opacity: 1; transform: translateY(0); }
+.pop-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fcfcfc;
+  border-radius: 12px 12px 0 0;
 }
+.pop-header strong { font-size: 13px; color: #333; display: block; max-width: 220px; line-height: 1.3; }
+.pop-badge {
+  font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 8px; color: white;
+}
+.pop-body { padding: 16px; max-height: 300px; overflow-y: auto; }
+.pop-comment {
+  font-style: italic; color: #555; background: #f8f9fa; padding: 12px; border-radius: 8px;
+  margin-bottom: 16px; border-left: 3px solid #ccc; line-height: 1.5; font-size: 11px;
+}
+.pop-grid { display: grid; grid-template-columns: 1fr auto; gap: 4px; row-gap: 6px; }
+.pg-row { display: contents; }
+.pg-label { color: #666; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px; }
+.pg-val { font-weight: 700; text-align: right; font-size: 11px; }
+.pg-bar-bg { background: #eee; height: 4px; border-radius: 2px; grid-column: span 2; margin-bottom: 6px; }
+.pg-bar-fill { height: 100%; border-radius: 2px; }
 
 /* NPS MATH PANEL */
 .nps-math{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;
@@ -263,6 +296,18 @@ footer{background:var(--azul-esc);color:rgba(255,255,255,.35);text-align:center;
   <div class="dot" title="KANO"></div>
   <div class="dot" title="Aplicado"></div>
   <div class="dot" title="Estratégia"></div>
+</div>
+
+<!-- HOVER PANEL -->
+<div id="hoverPanel" class="popover">
+  <div class="pop-header">
+    <strong id="popName">Nome da Loja</strong>
+    <span id="popBadge" class="pop-badge">--</span>
+  </div>
+  <div class="pop-body">
+    <div id="popComment" class="pop-comment"></div>
+    <div id="popGrid" class="pop-grid"></div>
+  </div>
 </div>
 
 <!-- ━━━━━━━ CAPA ━━━━━━━ -->
@@ -762,11 +807,14 @@ function renderLojistas(shop) {
       if(l.c==='prom') prom++; else if(l.c==='pass') pas++; else det++;
       const d = document.createElement('div');
       d.className = `loj-chip ${l.c}`;
-      const cl = l.c==='prom'?'Promotor':l.c==='pass'?'Passivo':'Detrator';
       d.setAttribute('data-cat', l.c);
       d.setAttribute('data-nome', l.n.toLowerCase());
-      d.setAttribute('data-tip', `${l.n} · Nota ${l.s} · ${cl}`);
       d.innerHTML = `${l.n} <span class="nota-badge">${l.s}</span>`;
+      
+      // Hover events
+      d.addEventListener('mouseenter', (e) => showPopover(e, l));
+      d.addEventListener('mouseleave', hidePopover);
+      
       grid.appendChild(d);
     });
   }
@@ -788,6 +836,80 @@ function renderLojistas(shop) {
   document.getElementById('btnAll').className='loj-btn active-all';
   const si = document.getElementById('searchLoj'); if(si) si.value='';
 }
+
+let popTimer;
+function showPopover(e, data) {
+  clearTimeout(popTimer);
+  const p = document.getElementById('hoverPanel');
+  
+  // Populate
+  document.getElementById('popName').textContent = data.n;
+  const badge = document.getElementById('popBadge');
+  badge.textContent = data.s.toFixed(1);
+  badge.style.backgroundColor = data.c === 'prom' ? '#27ae60' : (data.c === 'pass' ? '#f1c40f' : '#e74c3c');
+  
+  // Comment
+  const commEl = document.getElementById('popComment');
+  if (data.t && data.t.length > 3) {
+    commEl.textContent = `"${data.t}"`;
+    commEl.style.display = 'block';
+  } else {
+    commEl.style.display = 'none';
+  }
+  
+  // Grid
+  const grid = document.getElementById('popGrid');
+  grid.innerHTML = '';
+  if (data.d) {
+    // Sort by value desc
+    Object.entries(data.d).sort((a,b) => b[1] - a[1]).forEach(([k, v]) => {
+      // Filter out metadata if any slipped through
+      if(k.length > 30) k = k.substring(0,28)+'...';
+      
+      const color = v >= 9 ? '#27ae60' : (v >= 7 ? '#f1c40f' : '#e74c3c');
+      const row = document.createElement('div');
+      row.className = 'pg-row';
+      row.innerHTML = `
+        <div class="pg-label" title="${k}">${k}</div>
+        <div class="pg-val" style="color:${color}">${v.toFixed(1)}</div>
+        <div class="pg-bar-bg"><div class="pg-bar-fill" style="width:${v*10}%; background:${color}"></div></div>
+      `;
+      grid.appendChild(row);
+    });
+  }
+  
+  // Position
+  const rect = e.target.getBoundingClientRect();
+  const popHeight = p.offsetHeight || 300; // approx if not visible yet
+  const popWidth = 300;
+  
+  let top = rect.bottom + 8;
+  let left = rect.left + (rect.width/2) - (popWidth/2);
+  
+  // Check screen edges
+  if (left < 10) left = 10;
+  if (left + popWidth > window.innerWidth - 10) left = window.innerWidth - popWidth - 10;
+  if (top + popHeight > window.innerHeight - 10) {
+    // Flip to top if no space below
+    top = rect.top - popHeight - 8;
+  }
+  
+  p.style.top = `${top}px`;
+  p.style.left = `${left}px`;
+  p.classList.add('visible');
+}
+
+function hidePopover() {
+  popTimer = setTimeout(() => {
+    document.getElementById('hoverPanel').classList.remove('visible');
+  }, 100);
+}
+// Allow hovering over the popover itself to keep it open (optional but good UX)
+document.getElementById('hoverPanel').addEventListener('mouseenter', () => clearTimeout(popTimer));
+document.getElementById('hoverPanel').addEventListener('mouseleave', () => {
+  document.getElementById('hoverPanel').classList.remove('visible');
+});
+
 function setLojShop(shop, btn) {
   document.querySelectorAll('#lojShopFilter .shop-btn').forEach(b=>b.classList.remove('ativo'));
   btn.classList.add('ativo');
