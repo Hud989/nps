@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Evolução NPS Lojistas</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="lojistas_data.js"></script>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --card: #ffffff;
+    --text: #2c3e50;
+    --prom: #27ae60;
+    --pass: #f1c40f;
+    --detr: #e74c3c;
+    --nps: #2c3e50;
+    --vol: #95a5a6;
+  }
+  body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  h1 { font-size: 24px; font-weight: 700; color: #34495e; }
+  select { padding: 8px 16px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; font-weight: 600; }
+  
+  .card { background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+  .chart-container { position: relative; height: 400px; width: 100%; }
+  
+  .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+  .metric-box { background: #f1f2f6; padding: 15px; border-radius: 8px; text-align: center; }
+  .metric-val { font-size: 24px; font-weight: 800; }
+  .metric-lbl { font-size: 11px; text-transform: uppercase; color: #7f8c8d; font-weight: 700; margin-top: 5px; }
+  
+  .delta-pos { color: var(--prom); }
+  .delta-neg { color: var(--detr); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Evolução NPS Lojistas (2024–2025)</h1>
+  <select id="shopSelect" onchange="updateChart()">
+    <option value="GLOBAL">Visão Global (Rede)</option>
+    <!-- JS populates -->
+  </select>
+</div>
+
+<!-- Latest Metrics (2025) -->
+<div class="metrics-row" id="metricsRow">
+  <div class="metric-box">
+    <div class="metric-val" id="valNPS">--</div>
+    <div class="metric-lbl">NPS Atual (2025)</div>
+  </div>
+  <div class="metric-box">
+    <div class="metric-val" id="valVol">--</div>
+    <div class="metric-lbl">Respondentes</div>
+  </div>
+  <div class="metric-box">
+    <div class="metric-val" id="valProm" style="color:var(--prom)">--</div>
+    <div class="metric-lbl">% Promotores</div>
+  </div>
+  <div class="metric-box">
+    <div class="metric-val" id="valDet" style="color:var(--detr)">--</div>
+    <div class="metric-lbl">% Detratores</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="chart-container">
+    <canvas id="mainChart"></canvas>
+  </div>
+  <div style="text-align:center; margin-top:15px; font-size:12px; color:#7f8c8d;">
+    <span style="display:inline-block; width:12px; height:12px; background:var(--prom); margin-right:5px;"></span>Promotores
+    <span style="display:inline-block; width:12px; height:12px; background:var(--pass); margin-left:15px; margin-right:5px;"></span>Passivos
+    <span style="display:inline-block; width:12px; height:12px; background:var(--detr); margin-left:15px; margin-right:5px;"></span>Detratores
+    <span style="display:inline-block; width:20px; height:3px; background:var(--nps); margin-left:15px; margin-right:5px; vertical-align:middle;"></span>NPS Score
+    <span style="display:inline-block; width:10px; height:10px; border:2px solid var(--vol); border-radius:50%; margin-left:15px; margin-right:5px;"></span>Volume (n)
+  </div>
+</div>
+
+<script>
+Chart.register(ChartDataLabels);
+
+// Populate Select
+const shops = Object.keys(lojistasData).filter(k => k !== 'GLOBAL').sort();
+const select = document.getElementById('shopSelect');
+shops.forEach(s => {
+  const opt = document.createElement('option');
+  opt.value = s;
+  opt.innerText = s;
+  select.appendChild(opt);
+});
+
+let myChart = null;
+
+function updateChart() {
+  const shop = document.getElementById('shopSelect').value;
+  const data = lojistasData[shop]; // Array of objects {period, nps, total, prom_pct...}
+  
+  if (!data || data.length === 0) return;
+
+  // Latest Data (Last item)
+  const latest = data[data.length - 1];
+  document.getElementById('valNPS').innerText = latest.nps.toFixed(1);
+  document.getElementById('valVol').innerText = latest.total;
+  document.getElementById('valProm').innerText = latest.prom_pct + '%';
+  document.getElementById('valDet').innerText = latest.det_pct + '%';
+
+  // Chart Data
+  const labels = data.map(d => d.period);
+  const npsData = data.map(d => d.nps);
+  const promData = data.map(d => d.prom_pct);
+  const passData = data.map(d => d.pass_pct);
+  const detData = data.map(d => d.det_pct);
+  const volData = data.map(d => d.total);
+
+  if (myChart) myChart.destroy();
+
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          type: 'line',
+          label: 'NPS Score',
+          data: npsData,
+          borderColor: '#2c3e50',
+          borderWidth: 3,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#2c3e50',
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          yAxisID: 'yNPS',
+          datalabels: {
+            align: 'top',
+            anchor: 'end',
+            backgroundColor: '#2c3e50',
+            color: '#fff',
+            borderRadius: 4,
+            font: { weight: 'bold' },
+            formatter: (v) => v.toFixed(1)
+          }
+        },
+        {
+          label: 'Detratores',
+          data: detData,
+          backgroundColor: '#e74c3c',
+          stack: 'comp',
+          datalabels: { display: false } // Too cluttered usually
+        },
+        {
+          label: 'Passivos',
+          data: passData,
+          backgroundColor: '#f1c40f',
+          stack: 'comp',
+          datalabels: { display: false }
+        },
+        {
+          label: 'Promotores',
+          data: promData,
+          backgroundColor: '#27ae60',
+          stack: 'comp',
+          datalabels: { 
+            color: '#fff', 
+            font: { weight: 'bold' },
+            formatter: (v, ctx) => v > 10 ? v.toFixed(0) + '%' : ''
+          }
+        },
+        // Volume Indicator (Bubble style or separate axis? Let's try secondary axis point)
+        {
+          type: 'line',
+          label: 'Volume (n)',
+          data: volData,
+          borderColor: 'rgba(149, 165, 166, 0.5)',
+          backgroundColor: 'rgba(149, 165, 166, 0.1)',
+          pointStyle: 'circle',
+          pointRadius: 15,
+          pointBackgroundColor: 'rgba(255,255,255,0.8)',
+          pointBorderColor: '#95a5a6',
+          borderWidth: 1,
+          borderDash: [5, 5],
+          yAxisID: 'yVol',
+          datalabels: {
+            align: 'center',
+            color: '#7f8c8d',
+            font: { size: 10, weight: 'bold' },
+            formatter: (v) => 'n=' + v
+          }
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          callbacks: {
+            label: function(context) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              if (context.parsed.y !== null) {
+                label += context.parsed.y;
+                if (context.dataset.stack === 'comp') label += '%';
+              }
+              return label;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          min: 0,
+          max: 100,
+          stacked: true,
+          grid: { display: false },
+          title: { display: true, text: 'Composição (%)' }
+        },
+        yNPS: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          min: -20, // Adjust dynamically if needed
+          max: 100,
+          grid: { color: '#f0f0f0' },
+          title: { display: true, text: 'NPS Score' }
+        },
+        yVol: {
+            display: false, // Hidden axis just for scaling volume dots
+            min: 0,
+            max: Math.max(...volData) * 3 // Push dots to bottom
+        }
+      }
+    }
+  });
+}
+
+// Init
+updateChart();
+</script>
+</body>
+</html>

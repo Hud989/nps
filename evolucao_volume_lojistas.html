@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volume Absoluto NPS Lojistas</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="lojistas_data.js"></script>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; padding: 20px; }
+  .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+  h2 { margin-top: 0; color: #333; font-size: 18px; }
+  .chart-box { height: 300px; position: relative; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  @media(max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>Evolução do Volume de Respostas (Absoluto)</h1>
+<p style="color:#666; margin-bottom:20px;">Quantidade real de lojistas Detratores, Passivos e Promotores por onda de pesquisa.</p>
+
+<div class="grid" id="chartsGrid">
+  <!-- Charts will be injected here -->
+</div>
+
+<script>
+Chart.register(ChartDataLabels);
+
+const shops = Object.keys(lojistasData).filter(k => k !== 'GLOBAL').sort();
+
+const container = document.getElementById('chartsGrid');
+
+shops.forEach(shop => {
+  const data = lojistasData[shop];
+  if (!data || data.length === 0) return;
+
+  // Create Card
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<h2>${shop}</h2><div class="chart-box"><canvas id="chart_${shop}"></canvas></div>`;
+  container.appendChild(card);
+
+  // Prepare Data
+  const labels = data.map(d => d.period);
+  const prom = data.map(d => d.prom_abs);
+  const pass = data.map(d => d.pass_abs);
+  const detr = data.map(d => d.det_abs);
+
+  // Chart
+  const ctx = document.getElementById(`chart_${shop}`).getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Promotores',
+          data: prom,
+          backgroundColor: '#27ae60',
+          stack: 'stack1',
+          datalabels: { color: 'white', font: { weight: 'bold' } }
+        },
+        {
+          label: 'Passivos',
+          data: pass,
+          backgroundColor: '#f1c40f',
+          stack: 'stack1',
+          datalabels: { color: '#555', font: { weight: 'bold' } }
+        },
+        {
+          label: 'Detratores',
+          data: detr,
+          backgroundColor: '#e74c3c',
+          stack: 'stack1',
+          datalabels: { color: 'white', font: { weight: 'bold' } }
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom' },
+        title: { display: false }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: { 
+          beginAtZero: true,
+          title: { display: true, text: 'Quantidade de Lojistas' },
+          stacked: true
+        }
+      }
+    }
+  });
+});
+</script>
+
+</body>
+</html>
