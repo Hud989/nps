@@ -883,7 +883,7 @@ function showPopover(e, data) {
   const popHeight = p.offsetHeight || 300; // approx if not visible yet
   const popWidth = 300;
   
-  let top = rect.bottom + 8;
+  let top = rect.bottom + 2;
   let left = rect.left + (rect.width/2) - (popWidth/2);
   
   // Check screen edges
@@ -891,7 +891,7 @@ function showPopover(e, data) {
   if (left + popWidth > window.innerWidth - 10) left = window.innerWidth - popWidth - 10;
   if (top + popHeight > window.innerHeight - 10) {
     // Flip to top if no space below
-    top = rect.top - popHeight - 8;
+    top = rect.top - popHeight - 2;
   }
   
   p.style.top = `${top}px`;
@@ -902,7 +902,7 @@ function showPopover(e, data) {
 function hidePopover() {
   popTimer = setTimeout(() => {
     document.getElementById('hoverPanel').classList.remove('visible');
-  }, 100);
+  }, 400);
 }
 // Allow hovering over the popover itself to keep it open (optional but good UX)
 document.getElementById('hoverPanel').addEventListener('mouseenter', () => clearTimeout(popTimer));
