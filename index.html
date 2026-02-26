@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>A Ilusão do NPS — Storytelling CX | Sá Cavalcante</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --azul-esc:#0d1b2a; --azul:#1b3a5c; --azul-cl:#2471a3;
+  --dourado:#c8973a;  --ouro-cl:#f0c040; --cinza:#f4f6f9;
+  --verde:#1e8449;    --vermelho:#c0392b; --laranja:#d35400;
+  --prom:#27ae60;  --neu:#f1c40f;  --detr:#e74c3c;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#1a1a2e;font-size:15px;line-height:1.7;}
+h2{font-size:30px;font-weight:800;line-height:1.2;}
+h3{font-size:22px;font-weight:700;}
+.lead{font-size:18px;line-height:1.7;color:#444;}
+section{padding:72px 0;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px;}
+.wrap-wide{max-width:1280px;margin:0 auto;padding:0 28px;}
+
+/* CAPA */
+#s0{background:linear-gradient(150deg,var(--azul-esc) 0%,#1a2f4a 55%,#243b55 100%);
+  color:white;padding:0;min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;}
+#s0::before{content:'';position:absolute;width:560px;height:560px;
+  background:radial-gradient(circle,rgba(200,151,58,.18) 0%,transparent 70%);right:-80px;top:-80px;border-radius:50%;}
+.capa-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dourado);
+  margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.capa-label::before{content:'';display:inline-block;width:28px;height:2px;background:var(--dourado);}
+#s0 h1{font-size:46px;font-weight:900;line-height:1.1;color:white;margin-bottom:18px;}
+#s0 h1 em{color:var(--ouro-cl);font-style:normal;}
+#s0 .lead{color:rgba(255,255,255,.72);max-width:620px;margin-bottom:32px;}
+.pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px;}
+.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.2);padding:8px 16px;border-radius:24px;
+  font-size:12px;color:rgba(255,255,255,.8);}
+.btn-cta{display:inline-block;background:var(--dourado);color:white;padding:13px 30px;
+  border-radius:28px;font-weight:700;font-size:14px;text-decoration:none;letter-spacing:.4px;}
+
+/* NAV DOTS */
+.nav-dots{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:200;
+  display:flex;flex-direction:column;gap:9px;}
+.dot{width:9px;height:9px;border-radius:50%;background:rgba(0,0,0,.18);cursor:pointer;
+  transition:.25s;border:2px solid transparent;}
+.dot.active{background:var(--dourado);transform:scale(1.35);}
+.sep{height:3px;background:linear-gradient(90deg,var(--dourado),transparent);}
+
+/* SEÇÕES */
+.section-dark{background:var(--azul-esc);color:white;}
+.section-dark h2,.section-dark h3{color:white;}
+.section-dark .lead{color:rgba(255,255,255,.72);}
+.section-gray{background:var(--cinza);}
+
+/* STORY TAG */
+.story-tag{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--dourado);margin-bottom:10px;}
+.story-step{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start;margin-bottom:64px;}
+.story-step.rev{direction:rtl;}.story-step.rev>*{direction:ltr;}
+
+/* VBOX */
+.vbox{background:white;border-radius:14px;padding:26px;box-shadow:0 4px 28px rgba(0,0,0,.09);}
+.vbox-dark{background:rgba(255,255,255,.07);border-radius:14px;padding:26px;}
+
+/* FORMULA */
+.formula-wrap{background:#f8f9fc;border-radius:12px;padding:22px 26px;border-left:4px solid var(--dourado);margin:16px 0;}
+.formula{font-family:monospace;font-size:20px;font-weight:700;color:var(--azul);margin:8px 0;}
+
+/* ── VISUALIZAÇÃO LOJISTAS ── */
+#lojistaSection{margin-top:32px;}
+
+.loj-controls{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.loj-btn{padding:7px 18px;border-radius:20px;border:2px solid #ddd;background:white;
+  font-size:12px;font-weight:700;cursor:pointer;transition:.18s;}
+.loj-btn.active-all{background:var(--azul);color:white;border-color:var(--azul);}
+.loj-btn.active-prom{background:var(--prom);color:white;border-color:var(--prom);}
+.loj-btn.active-neu{background:#e6ac00;color:white;border-color:#e6ac00;}
+.loj-btn.active-detr{background:var(--detr);color:white;border-color:var(--detr);}
+.loj-btn:hover:not(.active-all):not(.active-prom):not(.active-neu):not(.active-detr){border-color:var(--azul);color:var(--azul);}
+
+.loj-search{padding:7px 14px;border-radius:20px;border:2px solid #ddd;font-size:12px;
+  outline:none;min-width:180px;font-family:inherit;}
+.loj-search:focus{border-color:var(--azul-cl);}
+
+.loj-grid{display:flex;flex-wrap:wrap;gap:7px;padding:20px;
+  background:white;border-radius:14px;box-shadow:0 2px 16px rgba(0,0,0,.08);
+  max-height:420px;overflow-y:auto;position:relative;}
+.loj-grid::-webkit-scrollbar{width:6px;}
+.loj-grid::-webkit-scrollbar-track{background:#f0f0f0;border-radius:3px;}
+.loj-grid::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px;}
+
+.loj-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;
+  font-size:12px;font-weight:600;cursor:pointer;transition:.15s;position:relative;
+  white-space:nowrap;border:1.5px solid transparent;}
+.loj-chip.prom{background:#eafaf1;color:#1d6a40;border-color:#a9dfbf;}
+.loj-chip.pass{background:#fff2b0;color:#6b4c00;border-color:#e6b800;}
+.loj-chip.detr{background:#fde8e6;color:#922b21;border-color:#f5b7b1;}
+.loj-chip.hidden{display:none!important;}
+.loj-chip .nota-badge{background:rgba(0,0,0,.12);border-radius:10px;padding:1px 6px;
+  font-size:10px;font-weight:800;}
+.loj-chip.prom .nota-badge{background:rgba(30,132,73,.2);}
+.loj-chip.pass .nota-badge{background:rgba(180,130,0,.25);}
+.loj-chip.detr .nota-badge{background:rgba(192,57,43,.2);}
+
+/* tooltip */
+.loj-chip:hover::after{
+  content:attr(data-tip);
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:rgba(13,27,42,.95);color:white;padding:7px 12px;border-radius:8px;
+  font-size:11px;white-space:nowrap;z-index:300;pointer-events:none;
+  box-shadow:0 4px 14px rgba(0,0,0,.3);
+}
+.loj-chip:hover::before{
+  content:'';position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:rgba(13,27,42,.95);z-index:301;pointer-events:none;
+}
+
+/* NPS MATH PANEL */
+.nps-math{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;
+  border-radius:12px;overflow:hidden;margin-top:20px;border:1px solid #eee;}
+.nm-block{padding:16px 12px;text-align:center;}
+.nm-op{padding:16px 8px;text-align:center;display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:900;color:#aaa;background:#fafafa;}
+.nm-num{font-size:28px;font-weight:900;line-height:1;}
+.nm-lbl{font-size:10px;color:#999;margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.nm-sub{font-size:11px;color:#aaa;margin-top:4px;}
+
+/* ZONA PASSIVA DESTAQUE */
+.zona-strip{display:flex;height:48px;border-radius:10px;overflow:hidden;margin:16px 0;}
+.zona-strip .z{display:flex;align-items:center;justify-content:center;
+  flex-direction:column;font-size:11px;font-weight:700;color:white;}
+
+/* CHARTS */
+.charts-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0;}
+.chart-card{background:white;border-radius:12px;padding:22px;box-shadow:0 2px 14px rgba(0,0,0,.08);}
+.chart-card.dark{background:rgba(255,255,255,.06);box-shadow:none;}
+.chart-card h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;margin-bottom:14px;}
+.chart-card h4.light{color:rgba(255,255,255,.5);}
+.cw{position:relative;height:270px;}
+.cw-sm{position:relative;height:220px;}
+
+/* TABELA COMPARATIVA */
+.comp-table{width:100%;border-collapse:collapse;font-size:13px;}
+.comp-table thead th{background:var(--azul);color:white;padding:10px 14px;
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.comp-table thead th.red{background:#b03020;}
+.comp-table thead th.blue{background:#1a6080;}
+.comp-table thead th.grn{background:#1a6040;}
+.comp-table tbody tr{border-bottom:1px solid #eef0f4;}
+.comp-table tbody tr:hover td{background:#f8fbff;}
+.comp-table td{padding:10px 14px;vertical-align:middle;}
+.pill-s{display:inline-block;padding:4px 11px;border-radius:14px;font-weight:800;font-size:14px;}
+.pill-crit{background:#fde8e6;color:#c0392b;}
+.pill-alert{background:#fef9e7;color:#b7770d;}
+.pill-ok{background:#eafaf1;color:#1d8348;}
+.pill-good{background:#d5f5e3;color:#145a32;}
+
+/* INSIGHT */
+.ins{border-left:4px solid;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:12px;display:flex;gap:14px;align-items:flex-start;}
+.ins.red{border-color:#e74c3c;background:#fde8e6;}
+.ins.blue{border-color:#3498db;background:#ebf5fb;}
+.ins.grn{border-color:#27ae60;background:#eafaf1;}
+.ins.yel{border-color:#f39c12;background:#fef9e7;color:#7d5200;}
+.ins .ico{font-size:22px;flex-shrink:0;margin-top:2px;}
+.ins .bdy strong{display:block;font-size:13px;margin-bottom:4px;}
+.ins .bdy p{font-size:12px;color:#555;line-height:1.65;}
+
+/* KANO */
+.kano-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:20px 0;}
+.kano-card{border-radius:12px;padding:20px;}
+.kano-card.bas{background:#eaf4fb;border-top:4px solid #2471a3;}
+.kano-card.per{background:#fef9e7;border-top:4px solid #d68910;}
+.kano-card.enc{background:#eafaf1;border-top:4px solid #1e8449;}
+.kano-card.rev{background:#fde8e6;border-top:4px solid #c0392b;}
+.kano-card h4{font-size:13px;font-weight:700;margin-bottom:8px;}
+.kano-card p{font-size:12px;color:#555;line-height:1.6;}
+.kano-card table{width:100%;font-size:12px;border-collapse:collapse;margin-top:10px;}
+.kano-card td{padding:4px 0;border-bottom:1px solid rgba(0,0,0,.06);}
+.kano-card td:last-child{text-align:right;font-weight:700;}
+
+/* HEATMAP */
+.hmap{width:100%;border-collapse:separate;border-spacing:3px;}
+.hmap th{background:var(--azul);color:white;padding:8px 10px;font-size:10px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.4px;border-radius:4px;}
+.hmap td{padding:7px 10px;text-align:center;border-radius:4px;font-weight:700;font-size:13px;}
+.hmap td.rl{text-align:left;font-size:12px;background:#f8f9fc;color:#333;font-weight:600;border-radius:4px;}
+
+/* TIMELINE */
+.tl{position:relative;padding-left:28px;}
+.tl::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;
+  background:linear-gradient(to bottom,var(--dourado),rgba(200,151,58,.1));}
+.tl-item{position:relative;margin-bottom:24px;}
+.tl-item::before{content:'';position:absolute;left:-23px;top:4px;width:12px;height:12px;
+  border-radius:50%;background:var(--dourado);border:2px solid white;box-shadow:0 0 0 2px var(--dourado);}
+.tl-item h4{font-size:14px;margin-bottom:3px;}
+.tl-item p{font-size:12px;color:#666;}
+
+/* CALLOUT */
+.callout{background:linear-gradient(135deg,var(--azul),#1a5f8a);color:white;
+  border-radius:14px;padding:28px 32px;margin:28px 0;}
+.callout h3{color:white;margin-bottom:10px;}
+.callout p{color:rgba(255,255,255,.8);font-size:14px;line-height:1.7;}
+.callout .hl{font-size:38px;font-weight:900;color:var(--ouro-cl);line-height:1;}
+.callout-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+
+/* STRATEGY */
+.strat{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;}
+.strat-card{border-radius:10px;padding:16px;}
+.strat-card.inv{background:#eafaf1;border:2px solid #27ae60;}
+.strat-card.man{background:#ebf5fb;border:2px solid #3498db;}
+.strat-card.rev-s{background:#fef9e7;border:2px solid #f39c12;}
+.strat-card.des{background:#fde8e6;border:2px solid #e74c3c;}
+.strat-card h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
+.strat-card ul{list-style:none;font-size:12px;color:#555;}
+.strat-card ul li{padding:2px 0;border-bottom:1px solid rgba(0,0,0,.05);}
+.strat-card ul li::before{content:'▸ ';}
+
+/* COBERTURA */
+.cob-row{display:grid;grid-template-columns:50px 1fr 120px;gap:10px;align-items:center;
+  padding:7px 0;border-bottom:1px solid rgba(255,255,255,.07);}
+.cob-row:last-child{border-bottom:none;}
+.cob-track{background:rgba(255,255,255,.1);border-radius:4px;height:7px;overflow:hidden;}
+.cob-fill{height:7px;border-radius:4px;}
+
+/* FADE ANIM */
+.fi{opacity:0;transform:translateY(24px);transition:opacity .75s ease,transform .75s ease;}
+.fi.on{opacity:1;transform:none;}
+
+/* HISTÓRICO */
+.hist-label{font-size:10px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.6);
+  padding:3px 10px;border-radius:10px;display:inline-block;margin-bottom:8px;}
+
+footer{background:var(--azul-esc);color:rgba(255,255,255,.35);text-align:center;padding:20px;font-size:11px;}
+
+/* SHOP FILTER */
+.shop-filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.shop-btn{padding:6px 16px;border-radius:18px;border:2px solid #ddd;background:white;
+  font-size:12px;font-weight:700;cursor:pointer;transition:.15s;}
+.shop-btn:hover{border-color:var(--azul-cl);color:var(--azul-cl);}
+.shop-btn.ativo{background:var(--azul);color:white;border-color:var(--azul);}
+.shop-btn.dark-btn{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);}
+.shop-btn.dark-btn:hover{background:rgba(255,255,255,.15);color:white;}
+.shop-btn.dark-btn.ativo{background:var(--dourado);color:white;border-color:var(--dourado);}
+
+@media(max-width:800px){
+  #s0 h1{font-size:30px;}
+  .story-step,.charts-2,.kano-grid,.callout-grid,.strat{grid-template-columns:1fr;}
+  .story-step.rev{direction:ltr;}
+  .nps-math{grid-template-columns:1fr;}
+  .nm-op{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav-dots" id="navDots">
+  <div class="dot active" title="Início"></div>
+  <div class="dot" title="A Ilusão"></div>
+  <div class="dot" title="A Matemática"></div>
+  <div class="dot" title="Realidade"></div>
+  <div class="dot" title="KANO"></div>
+  <div class="dot" title="Aplicado"></div>
+  <div class="dot" title="Estratégia"></div>
+</div>
+
+<!-- ━━━━━━━ CAPA ━━━━━━━ -->
+<section id="s0" style="padding:0;">
+<div class="wrap" style="padding-top:80px;padding-bottom:80px;position:relative;z-index:1;">
+  <div class="capa-label">Análise CX · Sá Cavalcante Shopping Centers</div>
+  <h1>Você sabe o que o <em>NPS</em><br>está te escondendo?</h1>
+  <p class="lead">Uma análise sobre como a métrica mais usada no varejo pode distorcer a percepção de sucesso — e como o Modelo KANO revela onde investir de verdade.</p>
+  <div class="pill-row">
+    <span class="pill">📊 Pesquisa NPS 2025 · Nov/25</span>
+    <span class="pill">🏬 6 shoppings · 456 lojistas</span>
+    <span class="pill">🔬 Modelo KANO aplicado</span>
+    <span class="pill">📅 Histórico 2024–2025</span>
+  </div>
+  <a href="#s1" class="btn-cta">Começar leitura ↓</a>
+</div>
+</section>
+<div class="sep"></div>
+
+<!-- ━━━━━━━ CAP 1 — A ILUSÃO ━━━━━━━ -->
+<section id="s1" style="background:white;">
+<div class="wrap">
+  <div class="story-tag fi">Capítulo 1 · O Problema</div>
+  <h2 class="fi" style="max-width:680px;margin-bottom:16px;">Você abre o relatório e vê esses números:</h2>
+
+  <div class="fi" style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:28px 0;">
+    <div id="kpi-smt" style="text-align:center;background:#fde8e6;border-radius:14px;padding:22px 28px;min-width:140px;">
+      <div style="font-size:64px;font-weight:900;line-height:1;color:#c0392b;" class="cnt" data-val="16.7">0</div>
+      <div style="font-size:11px;font-weight:700;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:.8px;">NPS SMT</div>
+    </div>
+    <div style="text-align:center;background:#fef9e7;border-radius:14px;padding:22px 28px;min-width:140px;">
+      <div style="font-size:64px;font-weight:900;line-height:1;color:#b7770d;" class="cnt" data-val="20.0">0</div>
+      <div style="font-size:11px;font-weight:700;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:.8px;">NPS SMA</div>
+    </div>
+    <div style="text-align:center;background:#fef9e7;border-radius:14px;padding:22px 28px;min-width:140px;">
+      <div style="font-size:64px;font-weight:900;line-height:1;color:#b7770d;" class="cnt" data-val="20.1">0</div>
+      <div style="font-size:11px;font-weight:700;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:.8px;">NPS SDI</div>
+    </div>
+    <div style="text-align:center;background:#fef9e7;border-radius:14px;padding:22px 28px;min-width:140px;">
+      <div style="font-size:64px;font-weight:900;line-height:1;color:#d35400;" class="cnt" data-val="29.7">0</div>
+      <div style="font-size:11px;font-weight:700;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:.8px;">NPS SMO</div>
+    </div>
+    <div style="text-align:center;background:#eafaf1;border-radius:14px;padding:22px 28px;min-width:140px;">
+      <div style="font-size:64px;font-weight:900;line-height:1;color:#1d8348;" class="cnt" data-val="32.0">0</div>
+      <div style="font-size:11px;font-weight:700;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:.8px;">NPS SMS</div>
+    </div>
+    <div style="text-align:center;background:#eafaf1;border-radius:14px;padding:22px 28px;min-width:140px;">
+      <div style="font-size:64px;font-weight:900;line-height:1;color:#1d8348;" class="cnt" data-val="33.3">0</div>
+      <div style="font-size:11px;font-weight:700;color:#888;margin-top:4px;text-transform:uppercase;letter-spacing:.8px;">NPS SRP</div>
+    </div>
+  </div>
+  <p class="fi" style="font-size:11px;color:#aaa;text-align:center;margin-bottom:32px;">
+    NPS Lojistas · Pesquisa 2025 (Nov) · Pergunta "O Shopping" · Momento: Fim do questionário
+  </p>
+
+  <div class="fi" style="max-width:700px;margin:0 auto;padding:26px;background:#f8f9fc;border-radius:14px;border-left:5px solid var(--dourado);">
+    <p style="font-size:17px;font-weight:700;color:var(--azul);margin-bottom:10px;">"Cinco shoppings abaixo de 35. Precisamos agir com urgência."</p>
+    <p style="color:#555;">Essa é a conclusão natural de quem vê esses números. E é uma conclusão que pode estar <strong>gravemente incompleta</strong>. O problema não é com os shoppings. É com a <strong>régua que estamos usando para medi-los.</strong></p>
+  </div>
+</div>
+</section>
+
+<!-- ━━━━━━━ CAP 2 — A MATEMÁTICA ━━━━━━━ -->
+<section id="s2" class="section-dark">
+<div class="wrap">
+  <div class="story-tag" style="color:var(--ouro-cl);">Capítulo 2 · Abrindo a Caixa Preta</div>
+  <h2 style="margin-bottom:10px;">Como o NPS funciona — e onde ele é cruel</h2>
+  <p class="lead" style="max-width:660px;margin-bottom:44px;">O NPS não mede satisfação média. Ele mede a <strong style="color:var(--ouro-cl);">diferença entre extremos</strong> — e descarta silenciosamente a maioria dos votos.</p>
+
+  <div class="story-step fi">
+    <div>
+      <h3 style="color:white;margin-bottom:14px;">A fórmula parece simples…</h3>
+      <div style="background:rgba(255,255,255,.08);border-radius:12px;padding:22px;border-left:4px solid var(--dourado);">
+        <div class="formula" style="color:var(--ouro-cl);">(% Promotores − % Detratores) × 100</div>
+        <div style="margin-top:14px;font-size:14px;color:rgba(255,255,255,.65);line-height:1.8;">
+          Nota <strong style="color:#27ae60;">9–10</strong> → Promotor ✓<br>
+          Nota <strong style="color:#f1c40f;">7–8</strong> → Passivo → <strong style="color:#e74c3c;">vale ZERO</strong><br>
+          Nota <strong style="color:#e74c3c;">0–6</strong> → Detrator ✓
+        </div>
+      </div>
+      <div class="zona-strip" style="margin-top:20px;">
+        <div class="z" style="width:20%;background:#e74c3c;">0–6<br>Detrator</div>
+        <div class="z" style="width:50%;background:#555;position:relative;">
+          <span>7–8 · Passivo</span>
+          <span style="font-size:10px;opacity:.7;">conta ZERO</span>
+        </div>
+        <div class="z" style="width:30%;background:#27ae60;">9–10<br>Promotor</div>
+      </div>
+    </div>
+    <div>
+      <h3 style="color:white;margin-bottom:14px;">…mas esconde uma decisão radical</h3>
+      <p style="color:rgba(255,255,255,.72);">Nota <strong style="color:var(--ouro-cl);">8</strong> = "Estou satisfeito com o shopping". O NPS responde: <em>"Obrigado, sua opinião não conta."</em></p>
+      <p style="color:rgba(255,255,255,.72);margin-top:12px;">Na pesquisa 2025, <strong style="color:white;">50% dos lojistas do SDI</strong> deram nota 7 ou 8. Metade da base simplesmente <strong style="color:#e74c3c;">desaparece do cálculo</strong>.</p>
+      <div style="background:rgba(255,255,255,.07);border-radius:10px;padding:16px;margin-top:16px;">
+        <p style="font-size:13px;color:rgba(255,255,255,.55);">Na rede como um todo (2025), <strong style="color:var(--ouro-cl);">~53%</strong> das respostas ficam nessa zona passiva — mais da metade dos votos descartados.</p>
+      </div>
+      <div class="charts-2" style="margin-top:22px;grid-template-columns:1fr;">
+        <div class="chart-card dark">
+          <h4 class="light">Distribuição das notas — Rede completa (NPS 2025, "O Shopping")</h4>
+          <div class="cw-sm"><canvas id="cDistGlobal"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VISUALIZAÇÃO REAL: LOJISTAS (todos os shoppings) ── -->
+  <div class="fi" id="lojistaSection">
+    <h3 style="color:white;margin-bottom:8px;">Quem são esses lojistas?</h3>
+    <p style="color:rgba(255,255,255,.6);font-size:13px;margin-bottom:14px;">Selecione um shopping para ver os lojistas reais da pesquisa 2025:</p>
+
+    <div class="shop-filter-row" id="lojShopFilter">
+      <button class="shop-btn dark-btn ativo" onclick="setLojShop('SDI',this)">SDI</button>
+      <button class="shop-btn dark-btn" onclick="setLojShop('SMA',this)">SMA</button>
+      <button class="shop-btn dark-btn" onclick="setLojShop('SMO',this)">SMO</button>
+      <button class="shop-btn dark-btn" onclick="setLojShop('SMS',this)">SMS</button>
+      <button class="shop-btn dark-btn" onclick="setLojShop('SMT',this)">SMT</button>
+      <button class="shop-btn dark-btn" onclick="setLojShop('SRP',this)">SRP</button>
+    </div>
+
+    <p style="color:rgba(255,255,255,.65);font-size:13px;margin-bottom:16px;">
+      Cada etiqueta é um lojista real do <strong style="color:white;" id="lojShopNome">SDI</strong> que respondeu a pesquisa 2025.
+      <span style="color:#27ae60;font-weight:700;">Verde = Promotor (9–10)</span> ·
+      <span style="color:#f1c40f;font-weight:700;">Amarelo = Passivo (7–8)</span> ·
+      <span style="color:#e74c3c;font-weight:700;">Vermelho = Detrator (0–6)</span>
+    </p>
+
+    <div class="loj-controls">
+      <button class="loj-btn active-all" id="btnAll" onclick="filtrarLojistas('all',this)">Todos (<span id="cntAll">134</span>)</button>
+      <button class="loj-btn" id="btnProm" onclick="filtrarLojistas('prom',this)">🟢 Promotores (<span id="cntProm">47</span>)</button>
+      <button class="loj-btn" id="btnNeu" onclick="filtrarLojistas('pass',this)">🟡 Passivos (<span id="cntNeu">67</span>) — ignorados pelo NPS</button>
+      <button class="loj-btn" id="btnDetr" onclick="filtrarLojistas('detr',this)">🔴 Detratores (<span id="cntDetr">20</span>)</button>
+      <input class="loj-search" type="text" placeholder="🔍 Buscar loja..." oninput="buscarLojista(this.value)" id="searchLoj">
+    </div>
+
+    <div class="loj-grid" id="lojGrid"></div>
+
+    <!-- PAINEL NPS MATH -->
+    <div class="nps-math" style="margin-top:16px;">
+      <div class="nm-block" style="background:#eafaf1;">
+        <div class="nm-num" style="color:#27ae60;" id="nmProm">47</div>
+        <div class="nm-lbl">Promotores</div>
+        <div class="nm-sub" id="nmPromPct">nota 9–10 · 35,1%</div>
+      </div>
+      <div class="nm-op">−</div>
+      <div class="nm-block" style="background:#fde8e6;">
+        <div class="nm-num" style="color:#e74c3c;" id="nmDetr">20</div>
+        <div class="nm-lbl">Detratores</div>
+        <div class="nm-sub" id="nmDetrPct">nota 0–6 · 14,9%</div>
+      </div>
+      <div class="nm-op">=</div>
+      <div class="nm-block" style="background:#fef9e7;">
+        <div class="nm-num" style="color:#b7770d;" id="nmNPS">20,1</div>
+        <div class="nm-lbl">NPS resultante</div>
+        <div class="nm-sub" id="nmPassDesc" style="color:#e74c3c;font-weight:700;">67 passivos descartados</div>
+      </div>
+    </div>
+
+    <div class="ins yel" style="margin-top:14px;">
+      <div class="ico">💡</div>
+      <div class="bdy">
+        <strong id="insTitle">O que aconteceu com os 67 passivos do SDI?</strong>
+        <p id="insText">Lojistas que deram nota 7 ou 8 estão <em>satisfeitos</em>. Mas no cálculo do NPS, eles <strong>simplesmente não existem</strong>. Esses votos reais, de lojistas reais, foram descartados pela metodologia.</p>
+      </div>
+    </div>
+
+    <!-- PAINEL COBERTURA DA PESQUISA -->
+    <div style="margin-top:18px;background:rgba(255,255,255,.06);border-radius:12px;padding:18px 22px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+        <span style="font-size:11px;font-weight:700;color:var(--dourado);text-transform:uppercase;letter-spacing:1.2px;">Cobertura da Pesquisa</span>
+        <span style="font-size:11px;color:rgba(255,255,255,.4);">Respondentes ÷ contratos ativos (lojas + quiosques)</span>
+      </div>
+
+      <div class="cob-row" style="padding-bottom:4px;">
+        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px;"></span>
+        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px;">Âncoras + Satélites + Quiosques</span>
+        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px;text-align:right;">Resp. / Total</span>
+      </div>
+
+      <div class="cob-row">
+        <span style="color:white;font-weight:700;font-size:13px;">SDI</span>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:4px;">18 + 238 + 115 = 371 contratos</div>
+          <div class="cob-track"><div class="cob-fill" style="width:36.1%;background:var(--dourado);"></div></div>
+        </div>
+        <span style="color:white;font-size:12px;font-weight:800;text-align:right;">134 / 371 <span style="color:var(--dourado);">36%</span></span>
+      </div>
+
+      <div class="cob-row">
+        <span style="color:white;font-weight:700;font-size:13px;">SMA</span>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:4px;">18 + 97 + 40 = 155 contratos</div>
+          <div class="cob-track"><div class="cob-fill" style="width:41.9%;background:var(--dourado);"></div></div>
+        </div>
+        <span style="color:white;font-size:12px;font-weight:800;text-align:right;">65 / 155 <span style="color:var(--dourado);">42%</span></span>
+      </div>
+
+      <div class="cob-row">
+        <span style="color:white;font-weight:700;font-size:13px;">SMO</span>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:4px;">10 + 107 + 52 = 169 contratos</div>
+          <div class="cob-track"><div class="cob-fill" style="width:21.9%;background:#e08c3a;"></div></div>
+        </div>
+        <span style="color:white;font-size:12px;font-weight:800;text-align:right;">37 / 169 <span style="color:#e08c3a;">22%</span></span>
+      </div>
+
+      <div class="cob-row">
+        <span style="color:white;font-weight:700;font-size:13px;">SMS</span>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:4px;">6 + 60 + 46 = 112 contratos</div>
+          <div class="cob-track"><div class="cob-fill" style="width:22.3%;background:#e08c3a;"></div></div>
+        </div>
+        <span style="color:white;font-size:12px;font-weight:800;text-align:right;">25 / 112 <span style="color:#e08c3a;">22%</span></span>
+      </div>
+
+      <div class="cob-row">
+        <span style="color:white;font-weight:700;font-size:13px;">SMT</span>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:4px;">9 + 124 + 49 = 182 contratos</div>
+          <div class="cob-track"><div class="cob-fill" style="width:56%;background:#27ae60;"></div></div>
+        </div>
+        <span style="color:white;font-size:12px;font-weight:800;text-align:right;">102 / 182 <span style="color:#27ae60;">56%</span></span>
+      </div>
+
+      <div class="cob-row">
+        <span style="color:white;font-weight:700;font-size:13px;">SRP</span>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:4px;">13 + 174 + 76 = 263 contratos</div>
+          <div class="cob-track"><div class="cob-fill" style="width:35.4%;background:var(--dourado);"></div></div>
+        </div>
+        <span style="color:white;font-size:12px;font-weight:800;text-align:right;">93 / 263 <span style="color:var(--dourado);">35%</span></span>
+      </div>
+
+      <div class="cob-row" style="border-top:1px solid rgba(255,255,255,.15);margin-top:6px;padding-top:10px;">
+        <span style="color:rgba(255,255,255,.5);font-weight:700;font-size:12px;">REDE</span>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:4px;">1.252 contratos ativos no total</div>
+          <div class="cob-track"><div class="cob-fill" style="width:36.4%;background:rgba(255,255,255,.4);"></div></div>
+        </div>
+        <span style="color:rgba(255,255,255,.7);font-size:12px;font-weight:800;text-align:right;">456 / 1.252 <span style="color:rgba(255,255,255,.9);">36%</span></span>
+      </div>
+
+      <p style="font-size:10px;color:rgba(255,255,255,.3);margin-top:12px;line-height:1.5;">
+        Contratos com status <em>Ativo e Previsto</em> ou <em>Indeterminado</em> em fev/2026. Tipo: Âncoras, Satélites e Quiosques.
+        SMT apresenta maior cobertura (56%) · SMO e SMS com menor adesão (&lt;23%).
+      </p>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ━━━━━━━ CAP 3 — A REALIDADE ━━━━━━━ -->
+<section id="s3" class="section-gray">
+<div class="wrap">
+  <div class="story-tag fi">Capítulo 3 · Os Números Reais</div>
+  <h2 class="fi" style="margin-bottom:12px;">Quando trocamos a régua, o cenário muda</h2>
+  <p class="lead fi" style="max-width:680px;margin-bottom:36px;">Os mesmos lojistas. Os mesmos votos. Duas metodologias — duas percepções completamente diferentes de sucesso.</p>
+
+  <div class="fi" style="background:white;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);margin-bottom:28px;">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;">Shopping</th>
+          <th class="red" style="text-align:center;">NPS Real<br><small style="font-weight:400;font-size:10px;">(Prom% − Detr%) × 100</small></th>
+          <th class="blue" style="text-align:center;">Média 0–10<br><small style="font-weight:400;font-size:10px;">todos os votos</small></th>
+          <th class="blue" style="text-align:center;">Score 0–100<br><small style="font-weight:400;font-size:10px;">média × 10</small></th>
+          <th style="text-align:center;background:#4a4a6a;">Gap<br><small style="font-weight:400;font-size:10px;">score − NPS</small></th>
+          <th class="grn" style="text-align:center;">% Satisfeitos<br><small style="font-weight:400;font-size:10px;">nota ≥ 7</small></th>
+          <th style="text-align:center;background:#6d4c41;">% Passivos<br><small style="font-weight:400;font-size:10px;">descartados</small></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#1abc9c;">SMO</strong><div style="font-size:10px;color:#aaa;">Shopping Moxuara</div></td>
+          <td style="text-align:center;"><span class="pill-s pill-ok">29,7</span></td>
+          <td style="text-align:center;font-weight:700;color:#1a6f9e;">8,22</td>
+          <td style="text-align:center;font-weight:800;color:#1a6f9e;font-size:16px;">82,2</td>
+          <td style="text-align:center;font-weight:800;color:#27ae60;">+52,5</td>
+          <td style="text-align:center;font-weight:800;color:#1d8348;">94,6%</td>
+          <td style="text-align:center;font-weight:700;color:#d68910;">59,5%</td>
+        </tr>
+        <tr style="background:#fafbfc;">
+          <td><strong style="color:#27ae60;">SRP</strong><div style="font-size:10px;color:#aaa;">Shopping Rio Poty</div></td>
+          <td style="text-align:center;"><span class="pill-s pill-ok">33,3</span></td>
+          <td style="text-align:center;font-weight:700;color:#1a6f9e;">8,30</td>
+          <td style="text-align:center;font-weight:800;color:#1a6f9e;font-size:16px;">83,0</td>
+          <td style="text-align:center;font-weight:800;color:#27ae60;">+49,7</td>
+          <td style="text-align:center;font-weight:800;color:#1d8348;">90,3%</td>
+          <td style="text-align:center;font-weight:700;color:#d68910;">47,3%</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#e67e22;">SMS</strong><div style="font-size:10px;color:#aaa;">Shopping Montserrat</div></td>
+          <td style="text-align:center;"><span class="pill-s pill-ok">32,0</span></td>
+          <td style="text-align:center;font-weight:700;color:#1a6f9e;">8,16</td>
+          <td style="text-align:center;font-weight:800;color:#1a6f9e;font-size:16px;">81,6</td>
+          <td style="text-align:center;font-weight:800;color:#27ae60;">+49,6</td>
+          <td style="text-align:center;font-weight:800;color:#1d8348;">88,0%</td>
+          <td style="text-align:center;font-weight:700;color:#d68910;">44,0%</td>
+        </tr>
+        <tr style="background:#fafbfc;">
+          <td><strong style="color:#3498db;">SDI</strong><div style="font-size:10px;color:#aaa;">Shopping da Ilha</div></td>
+          <td style="text-align:center;"><span class="pill-s pill-alert">20,1</span></td>
+          <td style="text-align:center;font-weight:700;color:#1a6f9e;">7,95</td>
+          <td style="text-align:center;font-weight:800;color:#1a6f9e;font-size:16px;">79,5</td>
+          <td style="text-align:center;font-weight:800;color:#27ae60;">+59,4</td>
+          <td style="text-align:center;font-weight:800;color:#1d8348;">85,1%</td>
+          <td style="text-align:center;font-weight:700;color:#e74c3c;font-weight:800;">50,0%</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#9b59b6;">SMA</strong><div style="font-size:10px;color:#aaa;">Shopping Mestre Álvaro</div></td>
+          <td style="text-align:center;"><span class="pill-s pill-alert">20,0</span></td>
+          <td style="text-align:center;font-weight:700;color:#1a6f9e;">7,98</td>
+          <td style="text-align:center;font-weight:800;color:#1a6f9e;font-size:16px;">79,8</td>
+          <td style="text-align:center;font-weight:800;color:#27ae60;">+59,8</td>
+          <td style="text-align:center;font-weight:800;color:#1d8348;">89,2%</td>
+          <td style="text-align:center;font-weight:700;color:#e74c3c;">58,5%</td>
+        </tr>
+        <tr style="background:#fafbfc;">
+          <td><strong style="color:#e74c3c;">SMT</strong><div style="font-size:10px;color:#aaa;">Shopping Metrópole Ananindeua</div></td>
+          <td style="text-align:center;"><span class="pill-s pill-crit">16,7</span></td>
+          <td style="text-align:center;font-weight:700;color:#1a6f9e;">7,70</td>
+          <td style="text-align:center;font-weight:800;color:#1a6f9e;font-size:16px;">77,0</td>
+          <td style="text-align:center;font-weight:800;color:#27ae60;">+60,3</td>
+          <td style="text-align:center;font-weight:800;color:#1d8348;">85,3%</td>
+          <td style="text-align:center;font-weight:700;color:#e74c3c;">53,9%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout fi">
+    <div class="callout-grid">
+      <div><div class="hl">87%</div><p>dos lojistas estão satisfeitos (nota ≥7) — o NPS médio de 25,3 não deixa isso evidente</p></div>
+      <div><div class="hl">+55 pts</div><p>de diferença média entre o score pela média real e o NPS — na mesma escala 0–100</p></div>
+      <div><div class="hl">53%</div><p>das respostas ficam na zona passiva (7–8) e são descartadas pela fórmula NPS</p></div>
+    </div>
+  </div>
+
+  <div class="charts-2 fi">
+    <div class="chart-card">
+      <h4>NPS Real vs Média ×10 — Pesquisa 2025</h4>
+      <div class="cw"><canvas id="cRealVsMedia"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h4>Evolução NPS "O Shopping" — Histórico 3 ondas</h4>
+      <div style="font-size:10px;background:#f0f4f8;color:#888;padding:4px 10px;border-radius:8px;display:inline-block;margin-bottom:10px;">
+        📅 Dado histórico — usado para análise de tendência
+      </div>
+      <div class="cw" style="height:230px;"><canvas id="cEvolucao"></canvas></div>
+    </div>
+  </div>
+
+  <div class="ins yel fi">
+    <div class="ico">⚠️</div>
+    <div class="bdy">
+      <strong>NPS não está errado — está medindo outra coisa</strong>
+      <p>O NPS mede <em>intensidade de entusiasmo</em>: quantos são tão satisfeitos que recomendariam ativamente. Isso tem valor para medir lealdade extrema. O problema está em usá-lo como <strong>único termômetro de satisfação operacional</strong>. Uma base de lojistas "racionalmente satisfeitos" (nota 8 sistemática) terá NPS baixo para sempre — não por ser ruim, mas por ter um perfil de avaliadores moderados.</p>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ━━━━━━━ CAP 4 — KANO INTRO ━━━━━━━ -->
+<section id="s4" style="background:white;">
+<div class="wrap">
+  <div class="story-tag fi">Capítulo 4 · O Modelo KANO</div>
+  <h2 class="fi" style="margin-bottom:12px;">Nem toda melhoria tem o mesmo impacto</h2>
+  <p class="lead fi" style="max-width:700px;margin-bottom:40px;">O professor Noriaki Kano descobriu nos anos 80 algo contraintuitivo: <strong>melhorar um atributo nem sempre aumenta satisfação</strong>. Depende de <em>qual</em> atributo você melhora.</p>
+
+  <div class="story-step fi">
+    <div>
+      <div class="tl">
+        <div class="tl-item">
+          <h4>🔵 Básico (Must-be)</h4>
+          <p>Obrigação. Se está ruim, todos reclamam. Se está ótimo, ninguém nota. Investir além do suficiente não move o NPS.</p>
+        </div>
+        <div class="tl-item">
+          <h4>🟡 Performance (Linear)</h4>
+          <p>Relação direta: melhor entrega → maior satisfação. Cada real investido tem retorno previsível.</p>
+        </div>
+        <div class="tl-item">
+          <h4>🟢 Encantador (Attractive)</h4>
+          <p>Não esperado. Quando bem entregue, <em>cria promotores</em>. Quando ausente, ninguém sente falta. Alto ROI reputacional.</p>
+        </div>
+        <div class="tl-item">
+          <h4>🔴 Reverso</h4>
+          <p>Mais entrega → mais insatisfação. Indica que o modelo de entrega está errado, não a intensidade.</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="vbox" style="padding:20px;">
+        <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:12px;">Curvas conceituais — KANO</p>
+        <div style="height:290px;"><canvas id="cKanoIntro"></canvas></div>
+        <p style="font-size:11px;color:#aaa;margin-top:8px;">X = Desempenho do atributo · Y = Satisfação do cliente</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ins blue fi">
+    <div class="ico">💡</div>
+    <div class="bdy">
+      <strong>Por que KANO + NPS funcionam juntos</strong>
+      <p>O NPS diz <em>se</em> você tem promotores. O KANO diz <em>onde investir</em> para criar mais. Sem o KANO, você pode gastar muito em Limpeza — que já está boa — e não mover o NPS nenhum ponto. Com o KANO, você sabe que cada real em Serviços gera mais retorno em NPS do que em qualquer outra dimensão.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ━━━━━━━ CAP 5 — KANO APLICADO ━━━━━━━ -->
+<section id="s5" class="section-gray">
+<div class="wrap-wide">
+<div class="wrap" style="padding:0;">
+  <div class="story-tag fi">Capítulo 5 · KANO nos Dados de 2025</div>
+  <h2 class="fi" style="margin-bottom:10px;">Mapeando as 13 dimensões da pesquisa</h2>
+  <p class="lead fi" style="max-width:700px;margin-bottom:36px;">Cruzando <strong>nota média</strong> com <strong>correlação com o NPS geral</strong> (pergunta "O Shopping"), cada dimensão encontra seu lugar no mapa KANO — com dados reais da pesquisa 2025.</p>
+</div>
+
+  <!-- Scatter KANO -->
+  <div class="fi" style="background:white;border-radius:14px;padding:26px;box-shadow:0 4px 22px rgba(0,0,0,.08);margin-bottom:28px;">
+    <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;margin-bottom:4px;">
+      Posicionamento KANO — Correlação com NPS × Nota Média (2025)
+    </h4>
+    <p style="font-size:11px;color:#bbb;margin-bottom:10px;">Eixo X: correlação Pearson com NPS geral · Eixo Y: nota média 0–10 · Tamanho = magnitude do impacto</p>
+    <div class="shop-filter-row" id="kanoShopFilter">
+      <button class="shop-btn ativo" onclick="setKanoShop('Todos',this)">Rede toda</button>
+      <button class="shop-btn" onclick="setKanoShop('SDI',this)">SDI</button>
+      <button class="shop-btn" onclick="setKanoShop('SMA',this)">SMA</button>
+      <button class="shop-btn" onclick="setKanoShop('SMO',this)">SMO</button>
+      <button class="shop-btn" onclick="setKanoShop('SMS',this)">SMS</button>
+      <button class="shop-btn" onclick="setKanoShop('SMT',this)">SMT</button>
+      <button class="shop-btn" onclick="setKanoShop('SRP',this)">SRP</button>
+    </div>
+    <div style="height:400px;"><canvas id="cKanoScatter"></canvas></div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;font-size:12px;">
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#2471a3;border-radius:50%;display:inline-block;"></span>Básico/Higiênico</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#d68910;border-radius:50%;display:inline-block;"></span>Performance/Linear</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#1e8449;border-radius:50%;display:inline-block;"></span>Encantador</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#c0392b;border-radius:50%;display:inline-block;"></span>Reverso/Crítico</span>
+    </div>
+  </div>
+
+  <!-- Cards KANO -->
+<div class="wrap" style="padding:0;">
+  <div class="kano-grid fi">
+    <div class="kano-card bas">
+      <h4>🔵 Básico / Higiênico — Obrigação</h4>
+      <p>Alta nota, baixa correlação com NPS. São itens esperados: ausência irrita, presença não encanta.</p>
+      <table>
+        <tr><td>Limpeza</td><td style="color:#27ae60;font-weight:700;">8,99</td><td>r=0,14</td></tr>
+        <tr><td>Segurança</td><td style="color:#27ae60;font-weight:700;">9,04</td><td>r=0,12</td></tr>
+        <tr><td>Estacionamento</td><td style="color:#27ae60;font-weight:700;">8,95</td><td>r=0,19</td></tr>
+        <tr><td>Moda</td><td style="color:#27ae60;font-weight:700;">9,09</td><td>r=0,21</td></tr>
+      </table>
+      <div style="margin-top:12px;background:rgba(36,113,163,.1);border-radius:8px;padding:10px;font-size:12px;color:#1a4f6e;">
+        <strong>Estratégia:</strong> Garantir baseline. Já estão bem avaliados — não superinvestir para crescimento de NPS, o retorno é decrescente.
+      </div>
+    </div>
+    <div class="kano-card enc">
+      <h4>🟢 Encantador — Criadores de Promotores</h4>
+      <p>Maiores correlações da rede. Cada ponto de melhora converte mais lojistas em promotores.</p>
+      <table>
+        <tr><td>Est. Externa</td><td style="color:#27ae60;font-weight:700;">9,01</td><td style="color:#27ae60;font-weight:700;">r=0,32</td></tr>
+        <tr><td>Est. Interna</td><td style="color:#27ae60;font-weight:700;">9,01</td><td style="color:#27ae60;font-weight:700;">r=0,29</td></tr>
+        <tr><td>Alimentação</td><td style="color:#27ae60;font-weight:700;">8,87</td><td style="color:#27ae60;">r=0,26</td></tr>
+        <tr><td>Entretenimento</td><td style="color:#27ae60;font-weight:700;">8,89</td><td style="color:#27ae60;">r=0,26</td></tr>
+      </table>
+      <div style="margin-top:12px;background:rgba(30,132,73,.1);border-radius:8px;padding:10px;font-size:12px;color:#1d6a40;">
+        <strong>Maior oportunidade:</strong> Est. Externa tem maior correlação (r=0,32). Estrutura física é o atributo que mais move o NPS quando melhorada.
+      </div>
+    </div>
+    <div class="kano-card per">
+      <h4>🟡 Performance / Linear — ROI Previsível</h4>
+      <p>Nota ainda baixa + correlação moderada = investimento com retorno mensurável em NPS.</p>
+      <table>
+        <tr><td>Financeira</td><td style="color:#e74c3c;font-weight:700;">7,10</td><td>r=0,18</td></tr>
+        <tr><td>Serviços</td><td style="color:#e74c3c;font-weight:700;">7,70</td><td>r=0,25</td></tr>
+      </table>
+      <div style="margin-top:12px;background:rgba(214,137,16,.1);border-radius:8px;padding:10px;font-size:12px;color:#7d6608;">
+        <strong>Alerta 2025:</strong> Financeira tem NPS de −16,1 em toda a rede. Serviços tem r=0,25 com nota ainda baixa — maior oportunidade de conversão rápida.
+      </div>
+    </div>
+    <div class="kano-card rev">
+      <h4>🔴 Reverso + Críticos</h4>
+      <p>Correlação negativa (Reverso) ou notas baixas sem impacto no NPS (Crítico).</p>
+      <table>
+        <tr><td style="font-weight:700;color:#c0392b;">Atend. Superin.</td><td style="color:#c0392b;font-weight:700;">2,71</td><td style="color:#c0392b;font-weight:700;">r=−0,11</td></tr>
+        <tr><td>Marketing</td><td style="color:#e74c3c;">7,35</td><td>r=0,02</td></tr>
+        <tr><td>Operações</td><td style="color:#e74c3c;">7,27</td><td>r=0,06</td></tr>
+      </table>
+      <div style="margin-top:12px;background:rgba(192,57,43,.1);border-radius:8px;padding:10px;font-size:12px;color:#922b21;">
+        <strong>Paradoxo 2025:</strong> Atend. Superintendente tem r=−0,11. Mais interação <em>no formato atual</em> piora o NPS. Modelo precisa mudar, não a intensidade.
+      </div>
+    </div>
+  </div>
+
+  <!-- Heatmap por Shopping -->
+  <h3 class="fi" style="margin:36px 0 12px;">Como cada shopping se posiciona em cada dimensão (2025)</h3>
+  <p class="fi" style="font-size:13px;color:#666;margin-bottom:16px;">Nota média 0–10. Verde = bom. Vermelho = crítico. Células abaixo de 7,0 são prioridade operacional.</p>
+  <div class="fi" style="background:white;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);">
+    <div style="overflow-x:auto;">
+      <table class="hmap">
+        <thead>
+          <tr>
+            <th style="text-align:left;min-width:200px;">Dimensão</th>
+            <th>SDI</th><th>SMA</th><th>SMO</th><th>SMS</th><th>SMT</th><th>SRP</th>
+            <th style="background:#333;">Média</th>
+            <th style="background:#555;">Tipo KANO</th>
+          </tr>
+        </thead>
+        <tbody id="hmapBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- DISPERSÃO POR PORTE E RAMO -->
+  <div style="margin-top:36px;">
+    <h3 class="fi" style="margin-bottom:6px;">Dispersão por Porte e Ramo de Atividade</h3>
+    <p class="fi" style="font-size:13px;color:#666;margin-bottom:4px;">Nota individual de cada lojista agrupada por classificação de loja.</p>
+    <p class="fi" style="font-size:11px;color:#aaa;margin-bottom:18px;">⚠️ Cobertura parcial: 84% dos lojistas não têm porte/ramo cadastrado — os gráficos mostram os <strong>73 lojistas com dados vinculados</strong>.</p>
+    <div class="charts-2 fi">
+      <div class="chart-card">
+        <h4>Dispersão por Porte de Loja — 73 lojistas</h4>
+        <p style="font-size:11px;color:#aaa;margin-bottom:8px;">Cada ponto = 1 lojista · 🟢 Promotor · 🟡 Passivo · 🔴 Detrator</p>
+        <div class="cw" style="height:300px;"><canvas id="cNivel1Scatter"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h4>NPS e Média por Ramo de Atividade — 73 lojistas</h4>
+        <p style="font-size:11px;color:#aaa;margin-bottom:8px;">Amostras pequenas (3–11 por categoria) — tendência indicativa</p>
+        <div class="cw" style="height:300px;"><canvas id="cNivel2Bar"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- ━━━━━━━ CAP 6 — ESTRATÉGIA ━━━━━━━ -->
+<section id="s6" style="background:white;">
+<div class="wrap">
+  <div class="story-tag fi">Capítulo 6 · O Que Fazer Com Isso</div>
+  <h2 class="fi" style="margin-bottom:12px;">A bússola estratégica</h2>
+  <p class="lead fi" style="max-width:700px;margin-bottom:36px;">NPS + KANO juntos respondem não só <em>onde você está</em>, mas <em>onde investir</em> para mover os indicadores com maior eficiência.</p>
+
+  <div class="strat fi">
+    <div class="strat-card inv">
+      <h4 style="color:#1e8449;">🚀 Investir — Alto ROI de NPS</h4>
+      <p style="font-size:12px;color:#555;margin-bottom:8px;">Alta correlação + nota ainda baixa</p>
+      <ul>
+        <li><strong>Serviços</strong> — r=0,25 · nota 7,70 · SMT e SMS abaixo de 7,20</li>
+        <li><strong>Financeira e Comercial</strong> — r=0,18 · NPS −16,1 · SMA em −39,1 (crítico)</li>
+        <li><strong>Est. Externa/Interna</strong> (enc) — r=0,32/0,29 · já altas, mas cada décimo importa</li>
+      </ul>
+    </div>
+    <div class="strat-card man">
+      <h4 style="color:#1a5276;">✅ Manter — Baseline garantido</h4>
+      <p style="font-size:12px;color:#555;margin-bottom:8px;">Nota alta, correlação moderada — não superinvestir além do necessário</p>
+      <ul>
+        <li><strong>Limpeza, Segurança, Estacionamento</strong> — notas 8,95–9,04</li>
+        <li><strong>Moda</strong> — 9,09 de média · SRP lidera com 9,53</li>
+        <li><strong>Alimentação, Entretenimento</strong> — encantadores bem entregues</li>
+      </ul>
+    </div>
+    <div class="strat-card rev-s">
+      <h4 style="color:#9a7d0a;">🔄 Rever Abordagem — Esforço sem retorno de NPS</h4>
+      <p style="font-size:12px;color:#555;margin-bottom:8px;">Nota baixa + correlação muito baixa — resolver operacionalmente sem expectativa de ganho imediato no NPS</p>
+      <ul>
+        <li><strong>Marketing</strong> — r=0,02 · nota 7,35 · lojista não percebe ROI das ações</li>
+        <li><strong>Operações</strong> — r=0,06 · nota 7,27 · gargalo operacional recorrente</li>
+      </ul>
+    </div>
+    <div class="strat-card des">
+      <h4 style="color:#922b21;">⛔ Redesenhar — Mais do mesmo piora</h4>
+      <p style="font-size:12px;color:#555;margin-bottom:8px;">Correlação negativa — o modelo de entrega precisa mudar</p>
+      <ul>
+        <li><strong>Atend. Superin.</strong> — r=−0,11 · nota 2,71/10 · NPS −45,9 na rede</li>
+        <li>SMA: pior índice, 1,85/10 · NPS −63,1</li>
+        <li>Interação reativa → migrar para modelo proativo/digital</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CONCLUSÃO -->
+  <div class="fi" style="border-radius:14px;overflow:hidden;margin-top:36px;">
+    <div style="background:var(--azul-esc);padding:30px 32px;">
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dourado);margin-bottom:10px;">Conclusão</div>
+      <h3 style="color:white;font-size:24px;margin-bottom:18px;">O que os dados de 2025 nos dizem, claramente</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <p style="color:rgba(255,255,255,.72);font-size:14px;line-height:1.8;">Os shoppings <strong style="color:white;">não estão em crise de satisfação</strong>. 87% dos lojistas dão nota 7 ou mais. O NPS baixo é parcialmente um artefato metodológico — penalidade por ter uma base de avaliadores "moderadamente satisfeitos".</p>
+        <p style="color:rgba(255,255,255,.72);font-size:14px;line-height:1.8;">O que precisa de atenção real: <strong style="color:var(--ouro-cl);">Serviços e Financeira</strong> (alto impacto, notas baixas) e o modelo de <strong style="color:var(--ouro-cl);">Atendimento do Superintendente</strong> — único fator com correlação negativa em toda a rede.</p>
+      </div>
+    </div>
+    <div style="background:var(--dourado);padding:18px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <p style="color:white;font-weight:700;font-size:14px;">Use NPS como termômetro de lealdade. Use Média + KANO como bússola de investimento.</p>
+      <p style="color:rgba(255,255,255,.75);font-size:12px;">Pesquisa NPS 2025 · Sá Cavalcante · Fev/2026</p>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<footer>Sá Cavalcante Shopping Centers · A Ilusão do NPS — Storytelling CX com Modelo KANO · Pesquisa 2025 · Fevereiro de 2026</footer>
+
+<!-- ━━━━━━━ JAVASCRIPT ━━━━━━━ -->
+<script>
+// ── DADOS ESTÁTICOS ──
+const nps2025 = {
+  SDI:{nps:20.1,media:7.95,n:134,prom:35.1,neu:50.0,detr:14.9},
+  SMA:{nps:20.0,media:7.98,n:65, prom:30.8,neu:58.5,detr:10.8},
+  SMO:{nps:29.7,media:8.22,n:37, prom:35.1,neu:59.5,detr:5.4},
+  SMS:{nps:32.0,media:8.16,n:25, prom:44.0,neu:44.0,detr:12.0},
+  SMT:{nps:16.7,media:7.70,n:102,prom:31.4,neu:53.9,detr:14.7},
+  SRP:{nps:33.3,media:8.30,n:93, prom:43.0,neu:47.3,detr:9.7}
+};
+
+// ── DADOS EXTRAÍDOS (2025) ──
+const todosLojistas = {
+  SDI: [
+    {n:'ALERGOCENTER',s:10.0,c:'prom'},
+    {n:'ADRENALINA PARK',s:10.0,c:'prom'},
+    {n:'CIA DO CHURRASCO',s:10.0,c:'prom'},
+    {n:'CLUBE DAS ESTRELINHAS',s:10.0,c:'prom'},
+    {n:'DIVINO FOGÃO',s:10.0,c:'prom'},
+    {n:'FEIRÃO BRADESCO',s:10.0,c:'prom'},
+    {n:'LIVE!',s:10.0,c:'prom'},
+    {n:'LINDT',s:10.0,c:'prom'},
+    {n:'LIZ',s:10.0,c:'prom'},
+    {n:'MINI KALZONE',s:10.0,c:'prom'},
+    {n:'ÓTICA DINIZ',s:10.0,c:'prom'},
+    {n:'NIKE STORE',s:10.0,c:'prom'},
+    {n:'OUZADIA PRIME JÓIAS',s:10.0,c:'prom'},
+    {n:'PICO',s:10.0,c:'prom'},
+    {n:'PUKET',s:10.0,c:'prom'},
+    {n:'SANTÊ',s:10.0,c:'prom'},
+    {n:'RIACHUELO',s:10.0,c:'prom'},
+    {n:'SKYLER',s:10.0,c:'prom'},
+    {n:'VICTOR HUGO',s:10.0,c:'prom'},
+    {n:'VOLTZ ELETROPOSTO',s:10.0,c:'prom'},
+    {n:'VIVA',s:10.0,c:'prom'},
+    {n:'ACIUM',s:9.0,c:'prom'},
+    {n:'AMAZON TOY',s:9.0,c:'prom'},
+    {n:'CAPITAL CÂMBIO',s:9.0,c:'prom'},
+    {n:'COLCCI',s:9.0,c:'prom'},
+    {n:'CRIAMIGOS',s:9.0,c:'prom'},
+    {n:'DOCE SURPRESA',s:9.0,c:'prom'},
+    {n:'CROCS',s:9.0,c:'prom'},
+    {n:'DRESS TO',s:9.0,c:'prom'},
+    {n:'HRO',s:9.0,c:'prom'},
+    {n:'IAP COSMÉTICOS',s:9.0,c:'prom'},
+    {n:'LAVAR E VESTIR LAVANDERIA',s:9.0,c:'prom'},
+    {n:'LUIZA BARCELOS',s:9.0,c:'prom'},
+    {n:'MATEUS SUPERMERCADOS',s:9.0,c:'prom'},
+    {n:'OLIVER SEMIJOIAS',s:9.0,c:'prom'},
+    {n:'OCULUM',s:9.0,c:'prom'},
+    {n:'PHOTO NOW',s:9.0,c:'prom'},
+    {n:'ÓTICA EVIDENCE',s:9.0,c:'prom'},
+    {n:'POPEYES',s:9.0,c:'prom'},
+    {n:'ÓTICAS CAROL',s:9.0,c:'prom'},
+    {n:'RASTEIRÍSSIMA',s:9.0,c:'prom'},
+    {n:'ROTAS MAKEUP',s:9.0,c:'prom'},
+    {n:'SÃO BRAZ',s:9.0,c:'prom'},
+    {n:'SURVIVE',s:9.0,c:'prom'},
+    {n:'T.DONUTS',s:9.0,c:'prom'},
+    {n:'TENDRESSE',s:9.0,c:'prom'},
+    {n:'VIA LASER',s:9.0,c:'prom'},
+    {n:'AC BRAZIL',s:8.0,c:'pass'},
+    {n:'AÇAÍ SUNSET',s:8.0,c:'pass'},
+    {n:'ALPHABETO',s:8.0,c:'pass'},
+    {n:'ARTWALK',s:8.0,c:'pass'},
+    {n:'ÁGUA DE CHEIRO',s:8.0,c:'pass'},
+    {n:'BELÍSSIMA MEU AMOR - ESMALTERIA',s:8.0,c:'pass'},
+    {n:'BELÍSSIMA CONCEPT',s:8.0,c:'pass'},
+    {n:'AVATIM',s:8.0,c:'pass'},
+    {n:'BOBS',s:8.0,c:'pass'},
+    {n:'BAGAGGIO',s:8.0,c:'pass'},
+    {n:'BODYTECH',s:8.0,c:'pass'},
+    {n:'CAMARADA CAMARÃO',s:8.0,c:'pass'},
+    {n:'CASA PILÃO',s:8.0,c:'pass'},
+    {n:'CHIQUINHO SORVETES',s:8.0,c:'pass'},
+    {n:'CHERRY BOMB',s:8.0,c:'pass'},
+    {n:'CENTRO MÉDICO MARANHENSE',s:8.0,c:'pass'},
+    {n:'CIA MARITIMA',s:8.0,c:'pass'},
+    {n:'COURO \u0026 CIA',s:8.0,c:'pass'},
+    {n:'BOTOCLINIC',s:8.0,c:'pass'},
+    {n:'COSECHAS',s:8.0,c:'pass'},
+    {n:'DEGRAUS',s:8.0,c:'pass'},
+    {n:'DRY TECH',s:8.0,c:'pass'},
+    {n:'DOM FERREIRA FORNERIA',s:8.0,c:'pass'},
+    {n:'GIRAFFAS',s:8.0,c:'pass'},
+    {n:'GOLD SPELL',s:8.0,c:'pass'},
+    {n:'GALLERY TATUAGEM E PIERCING',s:8.0,c:'pass'},
+    {n:'GRANDE RIO SL COMÉRCIO DE VEÍCULO..',s:8.0,c:'pass'},
+    {n:'IPLACE',s:8.0,c:'pass'},
+    {n:'KFC',s:8.0,c:'pass'},
+    {n:'LOUCOS POR COXINHA',s:8.0,c:'pass'},
+    {n:'JF\u0026D GELATERIA ARTESANAL LTD..',s:8.0,c:'pass'},
+    {n:'MILON',s:8.0,c:'pass'},
+    {n:'PHARMAPELE',s:8.0,c:'pass'},
+    {n:'PEGA BICHOS',s:8.0,c:'pass'},
+    {n:'RESERVA',s:8.0,c:'pass'},
+    {n:'RESTAURANTE BISTRÔ\u0026BOTECO',s:8.0,c:'pass'},
+    {n:'RENNER',s:8.0,c:'pass'},
+    {n:'RUTRA',s:8.0,c:'pass'},
+    {n:'SONHO DOS PÉS',s:8.0,c:'pass'},
+    {n:'Sá Cavalcante',s:8.0,c:'pass'},
+    {n:'TELEFONICA BRASIL S.A',s:8.0,c:'pass'},
+    {n:'STAND ALEMANHA CONSÓRCIO',s:8.0,c:'pass'},
+    {n:'TIM',s:8.0,c:'pass'},
+    {n:'TOUTI PERFUMES',s:8.0,c:'pass'},
+    {n:'TZ VIAGENS',s:8.0,c:'pass'},
+    {n:'TROPICAL ACESSÓRIOS',s:8.0,c:'pass'},
+    {n:'UCI-KINOPLEX',s:8.0,c:'pass'},
+    {n:'Feirão Sinduscon',s:7.0,c:'pass'},
+    {n:'ANA CAPRI',s:7.0,c:'pass'},
+    {n:'ALEATORY',s:7.0,c:'pass'},
+    {n:'AUTHENTIC FEET',s:7.0,c:'pass'},
+    {n:'APJ MUNDO DA MAKE',s:7.0,c:'pass'},
+    {n:'BOB´S',s:7.0,c:'pass'},
+    {n:'BÚFALO GROWLER',s:7.0,c:'pass'},
+    {n:'CAMICADO',s:7.0,c:'pass'},
+    {n:'CAPITAL VISTOS',s:7.0,c:'pass'},
+    {n:'EXTRAFARMA',s:7.0,c:'pass'},
+    {n:'ILHA DA PRATA',s:7.0,c:'pass'},
+    {n:'GRANADO PHARMÁCIAS',s:7.0,c:'pass'},
+    {n:'HAVAIANAS',s:7.0,c:'pass'},
+    {n:'INLAB',s:7.0,c:'pass'},
+    {n:'MR CAT',s:7.0,c:'pass'},
+    {n:'MÔ A MÔ',s:7.0,c:'pass'},
+    {n:'ORTOBOM',s:7.0,c:'pass'},
+    {n:'TOMMY HILFIGER',s:7.0,c:'pass'},
+    {n:'TUTTI ACESSOIRES',s:7.0,c:'pass'},
+    {n:'ZINZANE',s:7.0,c:'pass'},
+    {n:'AÇAÍ NO GRAU',s:6.0,c:'detr'},
+    {n:'AMAZON TOY',s:6.0,c:'detr'},
+    {n:'BODEGA DO PABLO',s:6.0,c:'detr'},
+    {n:'ARTEX',s:6.0,c:'detr'},
+    {n:'CHILLI BEANS LOJA',s:6.0,c:'detr'},
+    {n:'CS CLUB',s:6.0,c:'detr'},
+    {n:'FARM',s:6.0,c:'detr'},
+    {n:'PETITE JOLIE',s:6.0,c:'detr'},
+    {n:'SANTA LOLLA',s:6.0,c:'detr'},
+    {n:'ARAMIS',s:5.0,c:'detr'},
+    {n:'CHOPP TIJUCA',s:5.0,c:'detr'},
+    {n:'FACULDADE IDEA',s:5.0,c:'detr'},
+    {n:'HERING MEGA STORE',s:5.0,c:'detr'},
+    {n:'HÉLIO BOOKS',s:5.0,c:'detr'},
+    {n:'KLIN',s:5.0,c:'detr'},
+    {n:'SONO \u0026 ARTE',s:5.0,c:'detr'},
+    {n:'WORLD TENNIS',s:5.0,c:'detr'},
+    {n:'XIAOMI',s:5.0,c:'detr'},
+    {n:'KINGS SNEAKERS',s:4.0,c:'detr'},
+    {n:'BABY STORE',s:2.0,c:'detr'},
+  ],
+  SMA: [
+    {n:'BARBARELLA BIJU',s:10.0,c:'prom'},
+    {n:'CAFETERIA DO MESTRE',s:10.0,c:'prom'},
+    {n:'CASA \u0026 VIDEO',s:10.0,c:'prom'},
+    {n:'CASAS BAHIA',s:10.0,c:'prom'},
+    {n:'IMPERADOR BURGER',s:10.0,c:'prom'},
+    {n:'FIRST CLASS',s:10.0,c:'prom'},
+    {n:'GELATO BORELLI',s:10.0,c:'prom'},
+    {n:'LEITURA',s:10.0,c:'prom'},
+    {n:'LOJAS C\u0026A',s:10.0,c:'prom'},
+    {n:'PIZZARIA ALLEGRIA',s:10.0,c:'prom'},
+    {n:'SNAP BOARD SHOP',s:10.0,c:'prom'},
+    {n:'DAYCOVAL',s:9.0,c:'prom'},
+    {n:'ESPAÇO LASER',s:9.0,c:'prom'},
+    {n:'GIGANTE DA COLINA',s:9.0,c:'prom'},
+    {n:'LOS NETO',s:9.0,c:'prom'},
+    {n:'KOPENHAGEN',s:9.0,c:'prom'},
+    {n:'L OCCITANE AU BRESIL',s:9.0,c:'prom'},
+    {n:'REALME MALL',s:9.0,c:'prom'},
+    {n:'SIMMONS COLCHÕES',s:9.0,c:'prom'},
+    {n:'PORTO VITORIA CLUBE',s:9.0,c:'prom'},
+    {n:'ARTESANATO DA TERRA',s:8.0,c:'pass'},
+    {n:'BAHAMAS',s:8.0,c:'pass'},
+    {n:'BODYTECH',s:8.0,c:'pass'},
+    {n:'CARMEN STEFFENS OUTLET',s:8.0,c:'pass'},
+    {n:'CASA DO CELULAR',s:8.0,c:'pass'},
+    {n:'CASTORINO SANTANA',s:8.0,c:'pass'},
+    {n:'CASE QUEEN',s:8.0,c:'pass'},
+    {n:'COSECHAS',s:8.0,c:'pass'},
+    {n:'CLARO LOJA',s:8.0,c:'pass'},
+    {n:'CONFEITARIA VILA DO TRIGO',s:8.0,c:'pass'},
+    {n:'FARINELLA',s:8.0,c:'pass'},
+    {n:'FRAGRANCE IMPORTS',s:8.0,c:'pass'},
+    {n:'ICE CREAM ROLL',s:8.0,c:'pass'},
+    {n:'JAKLAYNE JOIAS',s:8.0,c:'pass'},
+    {n:'JOCA ESFIHA',s:8.0,c:'pass'},
+    {n:'LOJAS AMERICANAS',s:8.0,c:'pass'},
+    {n:'MAGIA DO MAR',s:8.0,c:'pass'},
+    {n:'ÓTICAS CAROL',s:8.0,c:'pass'},
+    {n:'PIPOCA AMERICANA',s:8.0,c:'pass'},
+    {n:'SPOLETO',s:8.0,c:'pass'},
+    {n:'TRIFIL',s:8.0,c:'pass'},
+    {n:'VITORIA TERNOS',s:8.0,c:'pass'},
+    {n:'SAMSUNG',s:8.0,c:'pass'},
+    {n:'VX CASE',s:8.0,c:'pass'},
+    {n:'SILVER LAND',s:8.0,c:'pass'},
+    {n:'ZE COXINHA',s:8.0,c:'pass'},
+    {n:'VILA PARQUE BOLICHE',s:8.0,c:'pass'},
+    {n:'ALE DO PUDIM',s:7.0,c:'pass'},
+    {n:'BURGER KING',s:7.0,c:'pass'},
+    {n:'CIA DO TERNO',s:7.0,c:'pass'},
+    {n:'CACAU SHOW',s:7.0,c:'pass'},
+    {n:'EURO COLCHOES',s:7.0,c:'pass'},
+    {n:'INPLAY VR',s:7.0,c:'pass'},
+    {n:'PASTIOLLA',s:7.0,c:'pass'},
+    {n:'PUKET',s:7.0,c:'pass'},
+    {n:'POLO CLUB',s:7.0,c:'pass'},
+    {n:'SUPERKIDS',s:7.0,c:'pass'},
+    {n:'VIVARA',s:7.0,c:'pass'},
+    {n:'BEBEDOUROS E CIA',s:6.0,c:'detr'},
+    {n:'CHIQUINHO SORVETES',s:6.0,c:'detr'},
+    {n:'CHILLI BEANS',s:6.0,c:'detr'},
+    {n:'LOS COMPADRES',s:6.0,c:'detr'},
+    {n:'METAL NOBRE',s:6.0,c:'detr'},
+    {n:'MILLENNIUM STORE',s:5.0,c:'detr'},
+    {n:'WEPINK',s:0.0,c:'detr'},
+  ],
+  SMO: [
+    {n:'JOHNNY ROCKETS',s:10.0,c:'prom'},
+    {n:'BH ATACADO E VAREJO',s:10.0,c:'prom'},
+    {n:'BODYTECH',s:10.0,c:'prom'},
+    {n:'BOB´S',s:10.0,c:'prom'},
+    {n:'GRILETTO',s:10.0,c:'prom'},
+    {n:'Santa Lolla',s:10.0,c:'prom'},
+    {n:'ALKA- INSTITUTO NUTRIÇÃO ESTÉTICA..',s:9.0,c:'prom'},
+    {n:'JN CALÇADOS',s:9.0,c:'prom'},
+    {n:'ESMALTIER CLUB',s:9.0,c:'prom'},
+    {n:'Havaianas',s:9.0,c:'prom'},
+    {n:'LE BISCUIT',s:9.0,c:'prom'},
+    {n:'LOS NETO MEGA',s:9.0,c:'prom'},
+    {n:'KONYK',s:9.0,c:'prom'},
+    {n:'BELÍSSIMA COSMÉTICOS',s:8.0,c:'pass'},
+    {n:'AVENIDA',s:8.0,c:'pass'},
+    {n:'CASA DO CELULAR',s:8.0,c:'pass'},
+    {n:'LAVANDERIA BUBBLEBOX.',s:8.0,c:'pass'},
+    {n:'Laser Rosa',s:8.0,c:'pass'},
+    {n:'LOS NETO',s:8.0,c:'pass'},
+    {n:'LOJAS AMERICANAS',s:8.0,c:'pass'},
+    {n:'LOTÉRICA',s:8.0,c:'pass'},
+    {n:'MILKSHAKE MIX',s:8.0,c:'pass'},
+    {n:'O BOTICÁRIO',s:8.0,c:'pass'},
+    {n:'PARAÍSO MAKEUP',s:8.0,c:'pass'},
+    {n:'SIPOLATTI',s:8.0,c:'pass'},
+    {n:'SOLIV',s:8.0,c:'pass'},
+    {n:'TAKE KIDS',s:8.0,c:'pass'},
+    {n:'Royal Face',s:8.0,c:'pass'},
+    {n:'Sonho dos Pés',s:8.0,c:'pass'},
+    {n:'BE HAPPY',s:7.0,c:'pass'},
+    {n:'GOLDEN TULIP',s:7.0,c:'pass'},
+    {n:'EMPÓRIO MAIA',s:7.0,c:'pass'},
+    {n:'KTX CALÇADOS',s:7.0,c:'pass'},
+    {n:'LOLITA BIJUTERIAS',s:7.0,c:'pass'},
+    {n:'PRIME EDITORIAL LTDA (BORA LÊ)',s:7.0,c:'pass'},
+    {n:'VOXX CRISTAL GRAFFITI',s:6.0,c:'detr'},
+    {n:'DI SANTINNI',s:5.0,c:'detr'},
+  ],
+  SMS: [
+    {n:'ECV UNION/MAP Vistoria',s:10.0,c:'prom'},
+    {n:'FINI',s:10.0,c:'prom'},
+    {n:'LOCALIZA',s:10.0,c:'prom'},
+    {n:'VIVO',s:10.0,c:'prom'},
+    {n:'VIRTUAL KIDS',s:10.0,c:'prom'},
+    {n:'MONZA',s:9.0,c:'prom'},
+    {n:'SPOLETO',s:9.0,c:'prom'},
+    {n:'SUBWAY',s:9.0,c:'prom'},
+    {n:'VITÓRIA TERNOS',s:9.0,c:'prom'},
+    {n:'VISÃO EXPRESS',s:9.0,c:'prom'},
+    {n:'ZARDA MODA FEMININA E AJUSTES',s:9.0,c:'prom'},
+    {n:'BRASIL CACAU',s:8.0,c:'pass'},
+    {n:'BYN GAMES',s:8.0,c:'pass'},
+    {n:'DON BURGER',s:8.0,c:'pass'},
+    {n:'HASHI',s:8.0,c:'pass'},
+    {n:'VERSATTO MÓVEIS',s:8.0,c:'pass'},
+    {n:'VIVENDA DO CAMARÃO',s:8.0,c:'pass'},
+    {n:'CACAU SHOW',s:7.0,c:'pass'},
+    {n:'KTX',s:7.0,c:'pass'},
+    {n:'O BOTICARIO',s:7.0,c:'pass'},
+    {n:'RENNER',s:7.0,c:'pass'},
+    {n:'REIS DOS VINHOS',s:7.0,c:'pass'},
+    {n:'EMPÓRIO MAIA',s:6.0,c:'detr'},
+    {n:'ITAPUA CALÇADOS',s:6.0,c:'detr'},
+    {n:'NATURA',s:5.0,c:'detr'},
+  ],
+  SMT: [
+    {n:'AMERICAN CHICKEN BROASTER',s:10.0,c:'prom'},
+    {n:'CELL SOLUTIONS (ANTENAS)',s:10.0,c:'prom'},
+    {n:'CREPEFY',s:10.0,c:'prom'},
+    {n:'DIVINO BUFFET',s:10.0,c:'prom'},
+    {n:'DELALÊ',s:10.0,c:'prom'},
+    {n:'FATIA MIA',s:10.0,c:'prom'},
+    {n:'ESTACAO CIDADANIA (COMODATO)',s:10.0,c:'prom'},
+    {n:'ELAS NO METRÓPOLE',s:10.0,c:'prom'},
+    {n:'MAIS SABOR',s:10.0,c:'prom'},
+    {n:'POLICIA FEDERAL',s:10.0,c:'prom'},
+    {n:'ALEXANDRA VEIGA DECORAÇÕES',s:9.0,c:'prom'},
+    {n:'BANPARÁ',s:9.0,c:'prom'},
+    {n:'CARINHO NO PÉ',s:9.0,c:'prom'},
+    {n:'BURGER KING',s:9.0,c:'prom'},
+    {n:'CHAVES E RESINADOS',s:9.0,c:'prom'},
+    {n:'Chiquinho Sorvetes',s:9.0,c:'prom'},
+    {n:'CIA DO TERNO',s:9.0,c:'prom'},
+    {n:'DAMYLLER',s:9.0,c:'prom'},
+    {n:'EDUARDO BARBOSA STÚDIO DE BELEZA',s:9.0,c:'prom'},
+    {n:'Fun Photo',s:9.0,c:'prom'},
+    {n:'FÁBRICA DO TERROR',s:9.0,c:'prom'},
+    {n:'FORNELLO',s:9.0,c:'prom'},
+    {n:'LUG´S BATATA BELGA ORIGINAL',s:9.0,c:'prom'},
+    {n:'MORE',s:9.0,c:'prom'},
+    {n:'MOTOKI MASSAGEM ORIENTAL',s:9.0,c:'prom'},
+    {n:'Mundo Bita',s:9.0,c:'prom'},
+    {n:'PIPOCA AMERICANA',s:9.0,c:'prom'},
+    {n:'SD SOBRANCELHAS DESIGN',s:9.0,c:'prom'},
+    {n:'SAPATARIA DO FUTURO',s:9.0,c:'prom'},
+    {n:'SPOLETO',s:9.0,c:'prom'},
+    {n:'VER O CHOPP',s:9.0,c:'prom'},
+    {n:'ZOO PARK',s:9.0,c:'prom'},
+    {n:'BIGX-PICANHA',s:8.0,c:'pass'},
+    {n:'AMAZON TOY',s:8.0,c:'pass'},
+    {n:'Casa do Celular',s:8.0,c:'pass'},
+    {n:'C\u0026A',s:8.0,c:'pass'},
+    {n:'Casa Típicas do Pará',s:8.0,c:'pass'},
+    {n:'CASAS BAHIA',s:8.0,c:'pass'},
+    {n:'CASTANHEIRA MOVEIS',s:8.0,c:'pass'},
+    {n:'COLOR BLUR',s:8.0,c:'pass'},
+    {n:'First Class',s:8.0,c:'pass'},
+    {n:'FINI',s:8.0,c:'pass'},
+    {n:'HASEGAWA FOR MEN',s:8.0,c:'pass'},
+    {n:'KOMBI DE URSOS',s:8.0,c:'pass'},
+    {n:'LUPO',s:8.0,c:'pass'},
+    {n:'LOJAS RENNER',s:8.0,c:'pass'},
+    {n:'OTICAS CAROL',s:8.0,c:'pass'},
+    {n:'NOVOMUNDO.COM',s:8.0,c:'pass'},
+    {n:'O BOTICARIO',s:8.0,c:'pass'},
+    {n:'OVEREND',s:8.0,c:'pass'},
+    {n:'PARK LONDON',s:8.0,c:'pass'},
+    {n:'PITICAS',s:8.0,c:'pass'},
+    {n:'ÓTICA CHILLI BEANS',s:8.0,c:'pass'},
+    {n:'POLÍCIA MILITAR',s:8.0,c:'pass'},
+    {n:'PRAIMER',s:8.0,c:'pass'},
+    {n:'SAPATINHO DE LUXO',s:8.0,c:'pass'},
+    {n:'SEM LIMITES VENDING MACHINE',s:8.0,c:'pass'},
+    {n:'SEMUTRAN (PASSE FÁCIL)',s:8.0,c:'pass'},
+    {n:'SERVIÇO EXPRESSO',s:8.0,c:'pass'},
+    {n:'Via Laser',s:8.0,c:'pass'},
+    {n:'WLAN',s:8.0,c:'pass'},
+    {n:'TIM',s:8.0,c:'pass'},
+    {n:'YES LASER',s:8.0,c:'pass'},
+    {n:'YES COSMÉTICOS',s:8.0,c:'pass'},
+    {n:'ZINZANE',s:8.0,c:'pass'},
+    {n:'SIMPALA',s:8.0,c:'pass'},
+    {n:'BELLE BIJOU',s:7.0,c:'pass'},
+    {n:'CHAVES \u0026 RESINADOS',s:7.0,c:'pass'},
+    {n:'CIRCUS TRANNING',s:7.0,c:'pass'},
+    {n:'INOVE',s:7.0,c:'pass'},
+    {n:'LUCA KIDS',s:7.0,c:'pass'},
+    {n:'MAX DOMINI',s:7.0,c:'pass'},
+    {n:'NEW PHONE',s:7.0,c:'pass'},
+    {n:'NO ON',s:7.0,c:'pass'},
+    {n:'Phone Store',s:7.0,c:'pass'},
+    {n:'PANDA EXPRESS',s:7.0,c:'pass'},
+    {n:'ÓTICA DINIZ',s:7.0,c:'pass'},
+    {n:'RABBITOHS',s:7.0,c:'pass'},
+    {n:'Pastel Loco',s:7.0,c:'pass'},
+    {n:'ROMMANEL',s:7.0,c:'pass'},
+    {n:'ROTA´S MAKEUP',s:7.0,c:'pass'},
+    {n:'NIKE STORE',s:7.0,c:'pass'},
+    {n:'SEGEF',s:7.0,c:'pass'},
+    {n:'TIM',s:7.0,c:'pass'},
+    {n:'USE FIT',s:7.0,c:'pass'},
+    {n:'THE DRIVER',s:7.0,c:'pass'},
+    {n:'World Tennis',s:7.0,c:'pass'},
+    {n:'KYOTTO',s:6.0,c:'detr'},
+    {n:'LUXO',s:6.0,c:'detr'},
+    {n:'MAKE NORTE',s:6.0,c:'detr'},
+    {n:'RIACHUELO',s:6.0,c:'detr'},
+    {n:'SANTA LOLLA',s:6.0,c:'detr'},
+    {n:'ROTA EMPREENDIMENTOS - PARQUE FUT..',s:6.0,c:'detr'},
+    {n:'SOFI ENCANTOS',s:6.0,c:'detr'},
+    {n:'YES COSMETICOS',s:6.0,c:'detr'},
+    {n:'LOJA LOBO (PAYSANDU)',s:5.0,c:'detr'},
+    {n:'MARIA DELICCATA',s:5.0,c:'detr'},
+    {n:'ZARP LOCALIZA',s:5.0,c:'detr'},
+    {n:'MUNDO GOSPEL',s:3.0,c:'detr'},
+    {n:'EXPOSIÇÃO METRÓPOLE DOS RÉPTEIS',s:2.0,c:'detr'},
+    {n:'CADEIRA DE MASSAGEM',s:0.0,c:'detr'},
+    {n:'Y.BEAUTY',s:0.0,c:'detr'},
+  ],
+  SRP: [
+    {n:'“CHICO XIQUE”',s:10.0,c:'prom'},
+    {n:'AMO VACINAS',s:10.0,c:'prom'},
+    {n:'AMORE PRATA',s:10.0,c:'prom'},
+    {n:'ANACAPRI',s:10.0,c:'prom'},
+    {n:'BOB S',s:10.0,c:'prom'},
+    {n:'BURGER KING (QUIOSQUE)',s:10.0,c:'prom'},
+    {n:'CAMARADA CAMARAO',s:10.0,c:'prom'},
+    {n:'BOB S (QUIOSQUE)',s:10.0,c:'prom'},
+    {n:'BROOKSFIELD',s:10.0,c:'prom'},
+    {n:'CASA QUEIROZ',s:10.0,c:'prom'},
+    {n:'CARTER´S',s:10.0,c:'prom'},
+    {n:'CHEIRIN BÃO',s:10.0,c:'prom'},
+    {n:'CLUBE MELISSA',s:10.0,c:'prom'},
+    {n:'ESPAÇO NASCER',s:10.0,c:'prom'},
+    {n:'DI SANTINNI',s:10.0,c:'prom'},
+    {n:'GRILETTO',s:10.0,c:'prom'},
+    {n:'HAVAIANAS',s:10.0,c:'prom'},
+    {n:'JOLI BIJOUX/',s:10.0,c:'prom'},
+    {n:'IAP! COSMÉTICOS',s:10.0,c:'prom'},
+    {n:'KALOR PRODUÇÕES',s:10.0,c:'prom'},
+    {n:'KIO MART',s:10.0,c:'prom'},
+    {n:'LOCALIZA',s:10.0,c:'prom'},
+    {n:'MC DONALDS',s:10.0,c:'prom'},
+    {n:'NATURA',s:10.0,c:'prom'},
+    {n:'ÓTICA AÓTICA',s:10.0,c:'prom'},
+    {n:'RIACHUELO',s:10.0,c:'prom'},
+    {n:'SAN PAOLO GELATERIA',s:10.0,c:'prom'},
+    {n:'YOUCOM',s:10.0,c:'prom'},
+    {n:'ADIDAS',s:9.0,c:'prom'},
+    {n:'A CAMPONESA',s:9.0,c:'prom'},
+    {n:'+ TECH',s:9.0,c:'prom'},
+    {n:'BISCOITÊ RIO POTY',s:9.0,c:'prom'},
+    {n:'CRIAMIGOS',s:9.0,c:'prom'},
+    {n:'CLUBE MORENA ROSA',s:9.0,c:'prom'},
+    {n:'DONA PRATA',s:9.0,c:'prom'},
+    {n:'GENDAI',s:9.0,c:'prom'},
+    {n:'GOLD SPELL',s:9.0,c:'prom'},
+    {n:'LEZ A LEZ',s:9.0,c:'prom'},
+    {n:'NAGEM',s:9.0,c:'prom'},
+    {n:'OCULUM',s:9.0,c:'prom'},
+    {n:'ANTARES VEICULOS LTDA',s:8.0,c:'pass'},
+    {n:'ALPHABETO',s:8.0,c:'pass'},
+    {n:'AUROIS MODA',s:8.0,c:'pass'},
+    {n:'CACTO DE PRATAS',s:8.0,c:'pass'},
+    {n:'CACTO DE PRATA',s:8.0,c:'pass'},
+    {n:'AREZZO',s:8.0,c:'pass'},
+    {n:'DEMOCRATA',s:8.0,c:'pass'},
+    {n:'GELATO BORELLI',s:8.0,c:'pass'},
+    {n:'CIA DO TERNO',s:8.0,c:'pass'},
+    {n:'JOLI BIJOUX',s:8.0,c:'pass'},
+    {n:'HONEY MIX',s:8.0,c:'pass'},
+    {n:'INOCENTES KIDS',s:8.0,c:'pass'},
+    {n:'KOPENHAGEN',s:8.0,c:'pass'},
+    {n:'LOCARKIDS',s:8.0,c:'pass'},
+    {n:'LS PERFUMARIA',s:8.0,c:'pass'},
+    {n:'MÁQUINA DE PRÊMIOS',s:8.0,c:'pass'},
+    {n:'MC DONALD S (QUIOSQUE)',s:8.0,c:'pass'},
+    {n:'MR HASHI',s:8.0,c:'pass'},
+    {n:'MUNDO FASTER',s:8.0,c:'pass'},
+    {n:'PONTO X BIJOUTERIAS',s:8.0,c:'pass'},
+    {n:'SA CAVALCANTE',s:8.0,c:'pass'},
+    {n:'SAMSUNG',s:8.0,c:'pass'},
+    {n:'RENNER',s:8.0,c:'pass'},
+    {n:'RESERVA',s:8.0,c:'pass'},
+    {n:'RYORI / SANTA GRELHA',s:8.0,c:'pass'},
+    {n:'RUBI',s:8.0,c:'pass'},
+    {n:'SCS MACHINES (Máquinas de pelúcia)',s:8.0,c:'pass'},
+    {n:'USAFLEX',s:8.0,c:'pass'},
+    {n:'VILA TRAMPOLIM',s:8.0,c:'pass'},
+    {n:'ZERO GRAU CHOPERIA',s:8.0,c:'pass'},
+    {n:'SILVIA´S HAIR',s:8.0,c:'pass'},
+    {n:'AÇAÍ NO GRAU',s:7.0,c:'pass'},
+    {n:'ARABESCO',s:7.0,c:'pass'},
+    {n:'BELISSIMA',s:7.0,c:'pass'},
+    {n:'CASAS BAHIA',s:7.0,c:'pass'},
+    {n:'CASEFANS',s:7.0,c:'pass'},
+    {n:'DONA FLOR',s:7.0,c:'pass'},
+    {n:'FARM',s:7.0,c:'pass'},
+    {n:'GIRAFFAS',s:7.0,c:'pass'},
+    {n:'FUN PHOTO BOOTH',s:7.0,c:'pass'},
+    {n:'KALUNGA COMERCIO E INDUSTRIA GRAF..',s:7.0,c:'pass'},
+    {n:'MORANA',s:7.0,c:'pass'},
+    {n:'PAGUE MENOS S/A',s:7.0,c:'pass'},
+    {n:'PETITE JOLIE',s:7.0,c:'pass'},
+    {n:'ARABESCO BRASIL',s:6.0,c:'detr'},
+    {n:'ARTS COUROS',s:6.0,c:'detr'},
+    {n:'CHIQUINHO SORVETES',s:6.0,c:'detr'},
+    {n:'FRUTASSA SUCOS E FRUTAS',s:6.0,c:'detr'},
+    {n:'TOKCELL PRIME',s:6.0,c:'detr'},
+    {n:'HERMANITO',s:5.0,c:'detr'},
+    {n:'SANTA LOLLA',s:5.0,c:'detr'},
+    {n:'STANLEY',s:5.0,c:'detr'},
+    {n:'MYPHONE',s:0.0,c:'detr'},
+  ],
+};
+
+const kanoGlobal = [
+  {t:'Limpeza',m:8.99,nps:64.2,r:0.143,n:447,cat:'bas'},
+  {t:'Segurança',m:9.04,nps:67.0,r:0.124,n:448,cat:'bas'},
+  {t:'Marketing',m:7.35,nps:-6.1,r:0.024,n:440,cat:'crit'},
+  {t:'Estacionamento',m:8.95,nps:64.4,r:0.193,n:444,cat:'bas'},
+  {t:'Est. Interna',m:9.01,nps:66.1,r:0.293,n:446,cat:'enc'},
+  {t:'Operações',m:7.27,nps:-9.3,r:0.062,n:441,cat:'crit'},
+  {t:'Est. Externa',m:9.01,nps:66.2,r:0.324,n:444,cat:'enc'},
+  {t:'Alimentação',m:8.87,nps:55.6,r:0.261,n:441,cat:'enc'},
+  {t:'Financeira',m:7.10,nps:-16.1,r:0.175,n:441,cat:'per'},
+  {t:'Entretenimento',m:8.89,nps:58.8,r:0.257,n:442,cat:'enc'},
+  {t:'Atend. Superin.',m:2.71,nps:-45.9,r:-0.110,n:451,cat:'rev'},
+  {t:'Moda',m:9.09,nps:65.3,r:0.213,n:441,cat:'bas'},
+  {t:'Serviços',m:7.70,nps:29.9,r:0.248,n:442,cat:'per'},
+];
+
+const kanoByShop = {
+  SDI: [
+    {t:'Limpeza',m:8.93,nps:59.4,r:0.051,n:133,cat:'bas'},{t:'Segurança',m:9.17,nps:72.2,r:0.116,n:133,cat:'bas'},
+    {t:'Marketing',m:7.27,nps:-9.2,r:0.035,n:130,cat:'crit'},{t:'Estacionamento',m:9.03,nps:70.2,r:0.127,n:131,cat:'bas'},
+    {t:'Est. Interna',m:9.0,nps:65.2,r:0.382,n:132,cat:'enc'},{t:'Operações',m:7.37,nps:-5.3,r:0.005,n:131,cat:'crit'},
+    {t:'Est. Externa',m:9.06,nps:69.5,r:0.416,n:131,cat:'enc'},{t:'Alimentação',m:8.83,nps:53.1,r:0.340,n:130,cat:'enc'},
+    {t:'Financeira',m:7.42,nps:-3.1,r:0.145,n:130,cat:'per'},{t:'Entretenimento',m:8.86,nps:57.7,r:0.379,n:130,cat:'enc'},
+    {t:'Atend. Superin.',m:2.63,nps:-47.4,r:-0.056,n:133,cat:'rev'},{t:'Moda',m:8.92,nps:56.9,r:0.226,n:130,cat:'bas'},
+    {t:'Serviços',m:7.54,nps:21.5,r:0.340,n:130,cat:'enc'},
+  ],
+  SMA: [
+    {t:'Limpeza',m:8.92,nps:64.1,r:0.373,n:64,cat:'enc'},{t:'Segurança',m:8.73,nps:56.2,r:0.048,n:64,cat:'bas'},
+    {t:'Marketing',m:7.54,nps:1.6,r:0.198,n:63,cat:'per'},{t:'Estacionamento',m:8.80,nps:56.2,r:0.283,n:64,cat:'enc'},
+    {t:'Est. Interna',m:9.02,nps:65.6,r:0.269,n:64,cat:'enc'},{t:'Operações',m:6.75,nps:-30.2,r:0.136,n:63,cat:'per'},
+    {t:'Est. Externa',m:8.77,nps:54.7,r:0.425,n:64,cat:'enc'},{t:'Alimentação',m:8.72,nps:47.6,r:0.184,n:63,cat:'bas'},
+    {t:'Financeira',m:6.52,nps:-39.1,r:0.334,n:64,cat:'enc'},{t:'Entretenimento',m:8.70,nps:50.0,r:0.297,n:64,cat:'enc'},
+    {t:'Atend. Superin.',m:1.85,nps:-63.1,r:0.005,n:65,cat:'crit'},{t:'Moda',m:8.89,nps:58.7,r:0.236,n:63,cat:'bas'},
+    {t:'Serviços',m:8.72,nps:53.1,r:0.108,n:64,cat:'bas'},
+  ],
+  SMO: [
+    {t:'Limpeza',m:8.86,nps:61.1,r:0.002,n:36,cat:'bas'},{t:'Segurança',m:8.94,nps:61.1,r:0.116,n:36,cat:'bas'},
+    {t:'Marketing',m:6.74,nps:-30.6,r:-0.130,n:36,cat:'rev'},{t:'Estacionamento',m:8.67,nps:52.8,r:0.014,n:36,cat:'bas'},
+    {t:'Est. Interna',m:8.97,nps:72.2,r:0.549,n:36,cat:'enc'},{t:'Operações',m:7.29,nps:-8.3,r:0.077,n:36,cat:'crit'},
+    {t:'Est. Externa',m:8.78,nps:61.1,r:0.394,n:36,cat:'enc'},{t:'Alimentação',m:9.11,nps:69.4,r:0.240,n:36,cat:'bas'},
+    {t:'Financeira',m:7.08,nps:-16.7,r:0.073,n:36,cat:'crit'},{t:'Entretenimento',m:9.12,nps:63.9,r:0.195,n:36,cat:'bas'},
+    {t:'Atend. Superin.',m:2.50,nps:-50.0,r:-0.055,n:36,cat:'rev'},{t:'Moda',m:9.32,nps:75.0,r:0.284,n:36,cat:'enc'},
+    {t:'Serviços',m:8.43,nps:47.2,r:0.093,n:36,cat:'bas'},
+  ],
+  SMS: [
+    {t:'Limpeza',m:9.08,nps:70.8,r:0.016,n:24,cat:'bas'},{t:'Segurança',m:9.33,nps:79.2,r:0.246,n:24,cat:'bas'},
+    {t:'Marketing',m:7.39,nps:-4.3,r:-0.096,n:23,cat:'rev'},{t:'Estacionamento',m:9.04,nps:65.2,r:0.023,n:23,cat:'bas'},
+    {t:'Est. Interna',m:9.17,nps:70.8,r:0.298,n:24,cat:'enc'},{t:'Operações',m:6.96,nps:-21.7,r:0.368,n:23,cat:'enc'},
+    {t:'Est. Externa',m:9.30,nps:87.0,r:0.300,n:23,cat:'enc'},{t:'Alimentação',m:8.24,nps:34.8,r:0.513,n:23,cat:'enc'},
+    {t:'Financeira',m:6.85,nps:-26.1,r:0.521,n:23,cat:'enc'},{t:'Entretenimento',m:8.91,nps:65.2,r:0.511,n:23,cat:'enc'},
+    {t:'Atend. Superin.',m:2.08,nps:-58.3,r:-0.522,n:24,cat:'rev'},{t:'Moda',m:9.00,nps:65.2,r:0.406,n:23,cat:'enc'},
+    {t:'Serviços',m:7.24,nps:30.4,r:0.310,n:23,cat:'enc'},
+  ],
+  SMT: [
+    {t:'Limpeza',m:8.94,nps:63.0,r:0.136,n:100,cat:'bas'},{t:'Segurança',m:8.93,nps:61.4,r:0.112,n:101,cat:'bas'},
+    {t:'Marketing',m:7.42,nps:-3.0,r:-0.045,n:100,cat:'rev'},{t:'Estacionamento',m:8.84,nps:58.0,r:0.202,n:100,cat:'bas'},
+    {t:'Est. Interna',m:8.88,nps:61.0,r:0.180,n:100,cat:'bas'},{t:'Operações',m:7.30,nps:-8.0,r:0.053,n:100,cat:'crit'},
+    {t:'Est. Externa',m:8.93,nps:59.0,r:0.156,n:100,cat:'bas'},{t:'Alimentação',m:8.62,nps:46.0,r:0.113,n:100,cat:'bas'},
+    {t:'Financeira',m:7.17,nps:-13.0,r:0.042,n:100,cat:'crit'},{t:'Entretenimento',m:8.84,nps:57.0,r:0.116,n:100,cat:'bas'},
+    {t:'Atend. Superin.',m:3.92,nps:-21.6,r:-0.270,n:102,cat:'rev'},{t:'Moda',m:9.01,nps:63.0,r:0.159,n:100,cat:'bas'},
+    {t:'Serviços',m:7.17,nps:19.0,r:0.271,n:100,cat:'enc'},
+  ],
+  SRP: [
+    {t:'Limpeza',m:9.19,nps:72.2,r:0.155,n:90,cat:'bas'},{t:'Segurança',m:9.13,nps:72.2,r:0.168,n:90,cat:'bas'},
+    {t:'Marketing',m:7.47,nps:-1.1,r:0.059,n:88,cat:'crit'},{t:'Estacionamento',m:9.18,nps:73.3,r:0.290,n:90,cat:'enc'},
+    {t:'Est. Interna',m:9.12,nps:70.0,r:0.232,n:90,cat:'bas'},{t:'Operações',m:7.53,nps:1.1,r:-0.004,n:88,cat:'rev'},
+    {t:'Est. Externa',m:9.23,nps:74.4,r:0.289,n:90,cat:'enc'},{t:'Alimentação',m:9.37,nps:75.3,r:0.298,n:89,cat:'enc'},
+    {t:'Financeira',m:7.02,nps:-19.3,r:0.305,n:88,cat:'enc'},{t:'Entretenimento',m:9.04,nps:65.2,r:0.173,n:89,cat:'bas'},
+    {t:'Atend. Superin.',m:2.31,nps:-53.8,r:0.157,n:91,cat:'per'},{t:'Moda',m:9.53,nps:80.9,r:0.065,n:89,cat:'bas'},
+    {t:'Serviços',m:7.63,nps:30.3,r:0.179,n:89,cat:'per'},
+  ],
+};
+
+const nivel1Cats = ['Âncoras','Semi-Âncoras','Satélites','Mall/Merch','Conv./Serv.'];
+const nivel1Stats = [
+  {label:'Âncoras',n:6,nps:33.3,media:8.5},
+  {label:'Semi-Âncoras',n:9,nps:11.1,media:7.89},
+  {label:'Satélites',n:29,nps:24.1,media:7.97},
+  {label:'Mall/Merch',n:21,nps:4.8,media:7.71},
+  {label:'Conv./Serv.',n:7,nps:42.9,media:8.57},
+];
+const nivel1Pontos = [
+  {x:0.098,y:8.0,c:'pass',shop:'SDI'},{x:-0.332,y:8.0,c:'pass',shop:'SMA'},
+  {x:-0.157,y:10.0,c:'prom',shop:'SMO'},{x:-0.194,y:8.0,c:'pass',shop:'SMO'},
+  {x:0.166,y:9.0,c:'prom',shop:'SMO'},{x:0.124,y:8.0,c:'pass',shop:'SMO'},
+  {x:1.275,y:8.0,c:'pass',shop:'SDI'},{x:0.711,y:7.0,c:'pass',shop:'SDI'},
+  {x:0.945,y:7.0,c:'pass',shop:'SMO'},{x:0.671,y:7.0,c:'pass',shop:'SMO'},
+  {x:0.803,y:8.0,c:'pass',shop:'SMO'},{x:1.004,y:8.0,c:'pass',shop:'SMO'},
+  {x:0.669,y:8.0,c:'pass',shop:'SMT'},{x:0.789,y:10.0,c:'prom',shop:'SRP'},
+  {x:1.105,y:8.0,c:'pass',shop:'SRP'},
+  {x:2.031,y:2.0,c:'detr',shop:'SDI'},{x:1.804,y:8.0,c:'pass',shop:'SDI'},
+  {x:2.062,y:9.0,c:'prom',shop:'SDI'},{x:2.217,y:10.0,c:'prom',shop:'SDI'},
+  {x:1.655,y:7.0,c:'pass',shop:'SMA'},{x:2.214,y:8.0,c:'pass',shop:'SMA'},
+  {x:2.139,y:6.0,c:'detr',shop:'SMA'},{x:1.888,y:9.0,c:'prom',shop:'SMA'},
+  {x:1.759,y:8.0,c:'pass',shop:'SMA'},{x:2.320,y:7.0,c:'pass',shop:'SMA'},
+  {x:1.886,y:10.0,c:'prom',shop:'SMO'},{x:1.715,y:8.0,c:'pass',shop:'SMO'},
+  {x:1.718,y:10.0,c:'prom',shop:'SMO'},{x:2.243,y:7.0,c:'pass',shop:'SMO'},
+  {x:2.073,y:10.0,c:'prom',shop:'SMO'},{x:2.215,y:9.0,c:'prom',shop:'SMO'},
+  {x:2.161,y:5.0,c:'detr',shop:'SMO'},{x:2.025,y:9.0,c:'prom',shop:'SMO'},
+  {x:2.331,y:7.0,c:'pass',shop:'SMO'},{x:1.915,y:9.0,c:'prom',shop:'SMO'},
+  {x:2.036,y:8.0,c:'pass',shop:'SMO'},{x:2.231,y:8.0,c:'pass',shop:'SMO'},
+  {x:2.083,y:8.0,c:'pass',shop:'SMO'},{x:2.253,y:9.0,c:'prom',shop:'SMO'},
+  {x:2.054,y:6.0,c:'detr',shop:'SMO'},{x:2.143,y:8.0,c:'pass',shop:'SMO'},
+  {x:1.682,y:10.0,c:'prom',shop:'SMO'},{x:1.810,y:8.0,c:'pass',shop:'SMS'},
+  {x:1.853,y:8.0,c:'pass',shop:'SMS'},
+  {x:2.706,y:7.0,c:'pass',shop:'SDI'},{x:2.813,y:8.0,c:'pass',shop:'SDI'},
+  {x:2.721,y:6.0,c:'detr',shop:'SDI'},{x:2.845,y:6.0,c:'detr',shop:'SDI'},
+  {x:3.095,y:8.0,c:'pass',shop:'SDI'},{x:2.905,y:10.0,c:'prom',shop:'SDI'},
+  {x:2.909,y:8.0,c:'pass',shop:'SDI'},{x:2.797,y:5.0,c:'detr',shop:'SDI'},
+  {x:2.837,y:8.0,c:'pass',shop:'SDI'},{x:3.306,y:9.0,c:'prom',shop:'SDI'},
+  {x:3.104,y:9.0,c:'prom',shop:'SDI'},{x:3.076,y:8.0,c:'pass',shop:'SDI'},
+  {x:2.770,y:8.0,c:'pass',shop:'SDI'},{x:3.160,y:5.0,c:'detr',shop:'SDI'},
+  {x:2.764,y:7.0,c:'pass',shop:'SMO'},
+  {x:2.916,y:10.0,c:'prom',shop:'SMT'},{x:3.343,y:8.0,c:'pass',shop:'SMT'},
+  {x:3.098,y:9.0,c:'prom',shop:'SMT'},{x:3.040,y:8.0,c:'pass',shop:'SMT'},
+  {x:3.129,y:7.0,c:'pass',shop:'SRP'},{x:3.240,y:8.0,c:'pass',shop:'SRP'},
+  {x:4.193,y:9.0,c:'prom',shop:'SMO'},{x:3.810,y:9.0,c:'prom',shop:'SMO'},
+  {x:3.672,y:8.0,c:'pass',shop:'SMO'},{x:3.871,y:8.0,c:'pass',shop:'SMO'},
+  {x:3.837,y:8.0,c:'pass',shop:'SMO'},{x:3.798,y:8.0,c:'pass',shop:'SMO'},
+  {x:4.310,y:10.0,c:'prom',shop:'SRP'},
+];
+const nivel2Stats = [
+  {cat:'QUIOSQUES',n:11,nps:-9.1,media:7.45},
+  {cat:'RELOJ. / JOALHERIAS',n:6,nps:16.7,media:8.0},
+  {cat:'ALIMENT. E BEBIDAS',n:6,nps:50.0,media:9.0},
+  {cat:'CALÇADOS',n:5,nps:40.0,media:8.2},
+  {cat:'SERVIÇOS ESTÉTICOS',n:4,nps:50.0,media:8.5},
+  {cat:'EVENTOS',n:4,nps:0.0,media:7.5},
+  {cat:'MODA',n:4,nps:0.0,media:7.75},
+  {cat:'VESTUÁRIO',n:4,nps:0.0,media:7.25},
+  {cat:'ARTIGOS DIVERSOS',n:3,nps:0.0,media:6.33},
+  {cat:'Alimentação e Beb.',n:3,nps:33.3,media:8.67},
+  {cat:'Magazines e Utens.',n:3,nps:33.3,media:8.0},
+  {cat:'VENDING MACHINES',n:3,nps:33.3,media:8.0},
+  {cat:'PERFUMARIA',n:3,nps:0.0,media:8.0},
+];
+
+const shopTema2025 = {
+  SDI:{'Limpeza':8.93,'Segurança':9.17,'Marketing':7.27,'Estacionamento':9.03,'Est. Interna':9.0,'Operações':7.37,'Est. Externa':9.06,'Alimentação':8.83,'Financeira':7.42,'Entretenimento':8.86,'Atend. Superin.':2.63,'Moda':8.92,'Serviços':7.54},
+  SMA:{'Limpeza':8.92,'Segurança':8.73,'Marketing':7.54,'Estacionamento':8.80,'Est. Interna':9.02,'Operações':6.75,'Est. Externa':8.77,'Alimentação':8.72,'Financeira':6.52,'Entretenimento':8.70,'Atend. Superin.':1.85,'Moda':8.89,'Serviços':8.72},
+  SMO:{'Limpeza':8.86,'Segurança':8.94,'Marketing':6.74,'Estacionamento':8.67,'Est. Interna':8.97,'Operações':7.29,'Est. Externa':8.78,'Alimentação':9.11,'Financeira':7.08,'Entretenimento':9.12,'Atend. Superin.':2.50,'Moda':9.32,'Serviços':8.43},
+  SMS:{'Limpeza':9.08,'Segurança':9.33,'Marketing':7.39,'Estacionamento':9.04,'Est. Interna':9.17,'Operações':6.96,'Est. Externa':9.30,'Alimentação':8.24,'Financeira':6.85,'Entretenimento':8.91,'Atend. Superin.':2.08,'Moda':9.00,'Serviços':7.24},
+  SMT:{'Limpeza':8.94,'Segurança':8.93,'Marketing':7.42,'Estacionamento':8.84,'Est. Interna':8.88,'Operações':7.30,'Est. Externa':8.93,'Alimentação':8.62,'Financeira':7.17,'Entretenimento':8.84,'Atend. Superin.':3.92,'Moda':9.01,'Serviços':7.17},
+  SRP:{'Limpeza':9.19,'Segurança':9.13,'Marketing':7.47,'Estacionamento':9.18,'Est. Interna':9.12,'Operações':7.53,'Est. Externa':9.23,'Alimentação':9.37,'Financeira':7.02,'Entretenimento':9.04,'Atend. Superin.':2.31,'Moda':9.53,'Serviços':7.63},
+};
+
+const evolucao = {
+  labels:['NPS 2024/1\nJun/24','NPS 2024/2\nNov/24','NPS 2025\nNov/25'],
+  SDI:[29.6,48.6,20.1], SMA:[17.9,15.1,20.0], SMO:[17.2,35.1,29.7],
+  SMS:[-5.9,21.4,32.0], SMT:[13.7,0.0,16.7],  SRP:[17.0,28.3,33.3]
+};
+
+const coresShop = {SDI:'#3498db',SMA:'#9b59b6',SMO:'#1abc9c',SMS:'#e67e22',SMT:'#e74c3c',SRP:'#27ae60'};
+const shoppings = ['SDI','SMA','SMO','SMS','SMT','SRP'];
+const shopNomes = {SDI:'SDI — Shopping da Ilha',SMA:'SMA — Shopping Mestre Álvaro',SMO:'SMO — Shopping Moxuara',SMS:'SMS — Shopping Montserrat',SMT:'SMT — Shopping Metrópole Ananindeua',SRP:'SRP — Shopping Rio Poty'};
+const catColors = {bas:'#2471a3',per:'#d68910',enc:'#1e8449',crit:'#c0392b',rev:'#922b21'};
+const catLabels = {bas:'🔵 Básico',per:'🟡 Performance',enc:'🟢 Encantador',crit:'🔴 Crítico',rev:'🔴 Reverso'};
+
+// ── ESTADO ──
+let kanoChart = null;
+
+// ── RENDERIZAR LOJISTAS (dinâmico por shopping) ──
+function renderLojistas(shop) {
+  const loj = todosLojistas[shop];
+  const grid = document.getElementById('lojGrid');
+  grid.innerHTML = '';
+  let prom=0, pas=0, det=0;
+  loj.forEach(l => {
+    if(l.c==='prom') prom++; else if(l.c==='pass') pas++; else det++;
+    const d = document.createElement('div');
+    d.className = `loj-chip ${l.c}`;
+    const cl = l.c==='prom'?'Promotor':l.c==='pass'?'Passivo':'Detrator';
+    d.setAttribute('data-cat', l.c);
+    d.setAttribute('data-nome', l.n.toLowerCase());
+    d.setAttribute('data-tip', `${l.n} · Nota ${l.s} · ${cl}`);
+    d.innerHTML = `${l.n} <span class="nota-badge">${l.s}</span>`;
+    grid.appendChild(d);
+  });
+  const total = loj.length;
+  document.getElementById('cntAll').textContent = total;
+  document.getElementById('cntProm').textContent = prom;
+  document.getElementById('cntNeu').textContent = pas;
+  document.getElementById('cntDetr').textContent = det;
+  document.getElementById('nmProm').textContent = prom;
+  document.getElementById('nmDetr').textContent = det;
+  document.getElementById('nmNPS').textContent = ((prom-det)/total*100).toFixed(1).replace('.',',');
+  document.getElementById('nmPromPct').textContent = `nota 9–10 · ${(prom/total*100).toFixed(1)}%`;
+  document.getElementById('nmDetrPct').textContent = `nota 0–6 · ${(det/total*100).toFixed(1)}%`;
+  document.getElementById('nmPassDesc').textContent = `${pas} passivos descartados`;
+  document.getElementById('lojShopNome').textContent = shopNomes[shop];
+  document.getElementById('insTitle').textContent = `O que aconteceu com os ${pas} passivos do ${shop}?`;
+  document.getElementById('insText').innerHTML = `${pas} lojistas deram nota 7 ou 8. Estão <em>satisfeitos</em>. Mas no cálculo do NPS, eles <strong>simplesmente não existem</strong>. Esses votos de lojistas reais foram descartados pela metodologia.`;
+  document.querySelectorAll('.loj-btn').forEach(b => b.className='loj-btn');
+  document.getElementById('btnAll').className='loj-btn active-all';
+  const si = document.getElementById('searchLoj'); if(si) si.value='';
+}
+function setLojShop(shop, btn) {
+  document.querySelectorAll('#lojShopFilter .shop-btn').forEach(b=>b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  renderLojistas(shop);
+}
+function filtrarLojistas(cat, btn) {
+  document.querySelectorAll('.loj-btn').forEach(b => b.className='loj-btn');
+  if(cat==='all') btn.className='loj-btn active-all';
+  else if(cat==='prom') btn.className='loj-btn active-prom';
+  else if(cat==='pass') btn.className='loj-btn active-neu';
+  else if(cat==='detr') btn.className='loj-btn active-detr';
+  document.querySelectorAll('.loj-chip').forEach(c => {
+    c.classList.toggle('hidden', cat!=='all' && c.dataset.cat!==cat);
+  });
+}
+function buscarLojista(q) {
+  const query = q.toLowerCase();
+  document.querySelectorAll('.loj-chip').forEach(c => {
+    c.classList.toggle('hidden', !c.dataset.nome.includes(query));
+  });
+}
+renderLojistas('SDI');
+
+// ── CONTADORES ANIMADOS ──
+function animCount(el, target, dur=1200) {
+  const start = performance.now();
+  function step(now) {
+    const p = Math.min((now-start)/dur, 1);
+    const ease = 1-Math.pow(1-p,3);
+    el.textContent = (target*ease).toFixed(1);
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+document.querySelectorAll('.cnt').forEach(el => {
+  const val = parseFloat(el.dataset.val);
+  setTimeout(() => animCount(el, val), 500);
+});
+
+// ── DIST GLOBAL 2025 ──
+// SDI dist: {2:1,4:1,5:9,6:9,7:20,8:47,9:26,10:21} n=134
+// Aproximação rede toda 2025 (456 respostas)
+const distGlobal2025 = [3,0,5,4,2,38,60,108,198,118,120]; // soma aprox
+new Chart(document.getElementById('cDistGlobal'),{
+  type:'bar',
+  data:{
+    labels:['0','1','2','3','4','5','6','7','8','9','10'],
+    datasets:[{
+      data:distGlobal2025,
+      backgroundColor:['#922b21','#c0392b','#e74c3c','#e74c3c','#e74c3c','#e67e22','#e67e22','#f1c40f','#52be80','#27ae60','#1d8348'],
+      borderRadius:3,borderWidth:0
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},
+      tooltip:{callbacks:{
+        title:ctx=>`Nota ${ctx[0].label}${(ctx[0].label==='7'||ctx[0].label==='8')?' ← PASSIVO (zero no NPS)':''}`,
+        label:ctx=>`${ctx.parsed.y} respostas`
+      }}
+    },
+    scales:{
+      y:{grid:{color:'rgba(255,255,255,.08)'},ticks:{color:'rgba(255,255,255,.5)'},title:{display:true,text:'Respostas',color:'rgba(255,255,255,.4)',font:{size:10}}},
+      x:{grid:{display:false},ticks:{color:'rgba(255,255,255,.5)'}}
+    }
+  }
+});
+
+// ── REAL VS MEDIA ──
+const shopsSorted = [...shoppings].sort((a,b)=>nps2025[b].media-nps2025[a].media);
+new Chart(document.getElementById('cRealVsMedia'),{
+  type:'bar',
+  data:{
+    labels:shopsSorted,
+    datasets:[
+      {label:'NPS Real',data:shopsSorted.map(s=>nps2025[s].nps),backgroundColor:'rgba(192,57,43,.75)',borderRadius:4},
+      {label:'Média × 10',data:shopsSorted.map(s=>+(nps2025[s].media*10).toFixed(1)),backgroundColor:'rgba(41,128,185,.65)',borderRadius:4}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top'}},
+    scales:{y:{beginAtZero:true,max:100,grid:{color:'#f0f0f4'}}}
+  }
+});
+
+// ── EVOLUÇÃO HISTÓRICA ──
+new Chart(document.getElementById('cEvolucao'),{
+  type:'line',
+  data:{
+    labels:['Jun/2024','Nov/2024','Nov/2025'],
+    datasets:shoppings.map(s=>({
+      label:s,data:evolucao[s],borderColor:coresShop[s],
+      backgroundColor:coresShop[s]+'18',
+      pointBackgroundColor:s==='SDI'?coresShop[s]:'',
+      pointRadius:s==='SDI'?7:4,
+      borderWidth:s==='SDI'?3:1.5,
+      tension:.3,fill:false
+    }))
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:10}}},
+    scales:{y:{grid:{color:'#f0f0f4'}},x:{grid:{display:false}}}
+  }
+});
+
+// ── KANO INTRO CURVAS ──
+new Chart(document.getElementById('cKanoIntro'),{
+  type:'line',
+  data:{
+    labels:[0,1,2,3,4,5,6,7,8,9,10],
+    datasets:[
+      {label:'Encantador',data:[0,0,1,2,5,10,20,35,55,78,100],borderColor:'#1e8449',backgroundColor:'rgba(30,132,73,.04)',tension:.5,borderWidth:2.5,pointRadius:0,fill:false},
+      {label:'Performance',data:[-30,-20,-10,0,10,22,38,55,70,84,100],borderColor:'#d68910',backgroundColor:'rgba(214,137,16,.04)',tension:.3,borderWidth:2.5,pointRadius:0,fill:false},
+      {label:'Básico',data:[-80,-60,-40,-20,-8,-2,2,5,7,8,10],borderColor:'#2471a3',backgroundColor:'rgba(36,113,163,.04)',tension:.3,borderWidth:2.5,pointRadius:0,fill:false},
+      {label:'Reverso',data:[40,28,18,8,0,-8,-18,-28,-38,-50,-62],borderColor:'#c0392b',backgroundColor:'rgba(192,57,43,.04)',tension:.3,borderWidth:2,pointRadius:0,fill:false,borderDash:[6,3]}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:10}}},
+    scales:{
+      x:{title:{display:true,text:'Desempenho →',font:{size:10}},grid:{color:'#f0f0f4'}},
+      y:{title:{display:true,text:'Satisfação →',font:{size:10}},grid:{color:'#f0f0f4'}}
+    }
+  }
+});
+
+// ── KANO SCATTER (com filtro por shopping) ──
+function buildKanoData(arr) {
+  const byCat = arr.reduce((acc,d)=>{
+    if(!acc[d.cat]) acc[d.cat]=[];
+    acc[d.cat].push({x:d.r, y:d.m, label:d.t, nps:d.nps, n:d.n});
+    return acc;
+  },{});
+  return Object.entries(byCat).map(([cat,pts])=>({
+    label: catLabels[cat]||cat,
+    data: pts,
+    backgroundColor: catColors[cat]||'#888',
+    pointRadius: pts.map(p=>Math.max(10,Math.abs(p.nps)/5+8)),
+    pointHoverRadius: 18
+  }));
+}
+function updateKanoScatter(shop) {
+  const arr = (shop==='Todos') ? kanoGlobal : kanoByShop[shop];
+  kanoChart.data.datasets = buildKanoData(arr);
+  kanoChart.update();
+}
+function setKanoShop(shop, btn) {
+  document.querySelectorAll('#kanoShopFilter .shop-btn').forEach(b=>b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  updateKanoScatter(shop);
+}
+(function(){
+  kanoChart = new Chart(document.getElementById('cKanoScatter'),{
+    type:'scatter',
+    data:{datasets: buildKanoData(kanoGlobal)},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top'},
+        tooltip:{callbacks:{label:ctx=>{
+          const p=ctx.raw;
+          return[`${p.label}`,`r = ${p.x.toFixed(3)}`,`Média = ${p.y.toFixed(2)}`,`NPS = ${p.nps.toFixed(1)}`,`n = ${p.n} respostas`];
+        }}}
+      },
+      scales:{
+        x:{min:-0.6,max:0.60,title:{display:true,text:'← Baixo impacto no NPS   |   Correlação Pearson   |   Alto impacto →',font:{size:11}},grid:{color:'#f0f0f4'}},
+        y:{min:0,max:10.5,title:{display:true,text:'Nota média (0–10)',font:{size:11}},grid:{color:'#f0f0f4'}}
+      }
+    }
+  });
+})();
+
+// ── HEATMAP ──
+(function(){
+  const tOrdem = ['Moda','Est. Interna','Est. Externa','Entretenimento','Alimentação','Segurança','Limpeza','Estacionamento','Serviços','Financeira','Operações','Marketing','Atend. Superin.'];
+  const kanoMap = {}; kanoGlobal.forEach(d=>kanoMap[d.t]=d);
+  function cellBg(v,t){
+    if(t==='Atend. Superin.') return v>=4?'#e74c3c':v>=3?'#c0392b':'#922b21';
+    if(v>=9.0)return'#1a6f3c'; if(v>=8.5)return'#27ae60'; if(v>=8.0)return'#52be80';
+    if(v>=7.5)return'#a9dfbf'; if(v>=7.0)return'#fef9e7'; if(v>=6.5)return'#fdebd0';
+    return'#e74c3c';
+  }
+  function cellFg(v,t){
+    if(t==='Atend. Superin.'||v<7.0||v>=8.0) return 'white';
+    return '#333';
+  }
+  const tbody = document.getElementById('hmapBody');
+  tOrdem.forEach(t=>{
+    const k = kanoMap[t]; if(!k) return;
+    const tr = document.createElement('tr');
+    let html = `<td class="rl">${t} <span style="font-size:10px;color:#aaa;">(r=${(k.r||0).toFixed(2)})</span></td>`;
+    ['SDI','SMA','SMO','SMS','SMT','SRP'].forEach(s=>{
+      const v = shopTema2025[s][t];
+      if(v===undefined){html+=`<td style="color:#ddd;">—</td>`;return;}
+      html+=`<td style="background:${cellBg(v,t)};color:${cellFg(v,t)};font-size:13px;">${v.toFixed(2)}</td>`;
+    });
+    html += `<td style="background:#333;color:white;font-weight:800;font-size:13px;">${k.m.toFixed(2)}</td>`;
+    html += `<td style="font-size:11px;font-weight:700;">${catLabels[k.cat]||k.cat}</td>`;
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  });
+})();
+
+// ── NIVEL1 JITTER SCATTER ──
+(function(){
+  const cores = {prom:'rgba(39,174,96,.8)',pass:'rgba(241,196,15,.9)',detr:'rgba(231,76,60,.85)'};
+  const lbl = {prom:'Promotor',pass:'Passivo',detr:'Detrator'};
+  const byCat = {};
+  nivel1Pontos.forEach(p=>{
+    if(!byCat[p.c]) byCat[p.c]=[];
+    byCat[p.c].push({x:p.x,y:p.y,shop:p.shop});
+  });
+  const datasets = Object.entries(byCat).map(([cat,pts])=>({
+    label:lbl[cat],data:pts,backgroundColor:cores[cat],
+    pointRadius:8,pointHoverRadius:11
+  }));
+  new Chart(document.getElementById('cNivel1Scatter'),{
+    type:'scatter',data:{datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top'},
+        tooltip:{callbacks:{
+          label:ctx=>`${ctx.raw.shop} · Nota ${ctx.raw.y}`,
+          title:ctx=>{const i=Math.round(ctx[0].parsed.x);return nivel1Cats[i]||'';}
+        }}
+      },
+      scales:{
+        x:{min:-0.6,max:4.6,
+          ticks:{callback:(v)=>{const i=Math.round(v);return(i>=0&&i<nivel1Cats.length&&Math.abs(v-i)<0.35)?nivel1Cats[i]:'';},stepSize:1},
+          grid:{color:'#f0f0f4'}},
+        y:{min:0,max:10.5,title:{display:true,text:'Nota (0–10)'},grid:{color:'#f0f0f4'}}
+      }
+    }
+  });
+})();
+
+// ── NIVEL2 BAR CHART ──
+(function(){
+  new Chart(document.getElementById('cNivel2Bar'),{
+    type:'bar',
+    data:{
+      labels:nivel2Stats.map(d=>d.cat),
+      datasets:[
+        {label:'NPS',data:nivel2Stats.map(d=>d.nps),backgroundColor:'rgba(192,57,43,.7)',borderRadius:3},
+        {label:'Média×10',data:nivel2Stats.map(d=>+(d.media*10).toFixed(1)),backgroundColor:'rgba(41,128,185,.6)',borderRadius:3}
+      ]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top'},
+        tooltip:{callbacks:{footer:items=>`n = ${nivel2Stats[items[0].dataIndex].n} lojistas`}}
+      },
+      scales:{
+        x:{min:-50,max:100,grid:{color:'#f0f0f4'}},
+        y:{grid:{display:false},ticks:{font:{size:10}}}
+      }
+    }
+  });
+})();
+
+// ── FADE ANIM ──
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('on'); });
+},{threshold:0.12});
+document.querySelectorAll('.fi').forEach(el=>io.observe(el));
+
+// ── NAV DOTS ──
+const secs = ['s0','s1','s2','s3','s4','s5','s6'];
+const dots = document.querySelectorAll('.dot');
+const ioNav = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const i = secs.indexOf(e.target.id);
+      dots.forEach(d=>d.classList.remove('active'));
+      if(i>=0) dots[i].classList.add('active');
+    }
+  });
+},{threshold:0.4});
+secs.forEach(id=>{ const el=document.getElementById(id); if(el)ioNav.observe(el); });
+</script>
+</body>
+</html>
