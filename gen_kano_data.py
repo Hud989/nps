@@ -201,22 +201,31 @@ if col_loja:
                 # Round values
                 details = {k: round(v, 1) for k, v in d_dict.items()}
             
-            # Get Comments
-            # Filter df_2025 for this RID and non-null comments
-            # Comments might be in any row for this RID
-            comments = df_2025[
-                (df_2025['ResponseID'] == rid) & 
-                (df_2025['Comentario'].notna()) & 
-                (df_2025['Comentario'] != '')
-            ]['Comentario'].unique()
+            # Get Comments per Theme
+            # Filter df_2025 for this RID
+            rid_rows = df_2025[df_2025['ResponseID'] == rid]
             
-            comment_text = " | ".join([str(c).strip() for c in comments if str(c).strip()])
+            comments_by_theme = {}
+            general_comments = []
+            
+            for _, r_row in rid_rows.iterrows():
+                c_txt = str(r_row['Comentario']).strip()
+                if c_txt and c_txt.lower() != 'nan' and c_txt != '':
+                    tema = r_row['Tema']
+                    if tema == TARGET:
+                        general_comments.append(c_txt)
+                    else:
+                        comments_by_theme[tema] = c_txt
+            
+            # Join general comments
+            comment_text = " | ".join(general_comments)
             
             obj = {
                 'n': name, 
                 's': float(score), 
                 'c': cat,
-                'd': details
+                'd': details,
+                'ct': comments_by_theme
             }
             if comment_text:
                 obj['t'] = comment_text
